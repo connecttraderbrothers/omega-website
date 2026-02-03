@@ -1,18 +1,11 @@
 // ============ CONFIGURATION ============
-// Update these URLs to point to your asset repository
-const ASSETS = {
-    logo: 'https://raw.githubusercontent.com/YOUR_USERNAME/omega-assets/main/omega-logo.png',
-    splashVideo: 'https://raw.githubusercontent.com/YOUR_USERNAME/omega-assets/main/omega-splash.mp4'
-};
-
-// Splash screen end time (in seconds) - adjust based on when gold logo fades out
-const SPLASH_END_TIME = 5.0;
+// Splash screen duration in seconds
+const SPLASH_DURATION = 6;
 
 // ============ DOM ELEMENTS ============
 const splashScreen = document.getElementById('splash-screen');
 const mainContent = document.getElementById('main-content');
 const splashVideo = document.getElementById('splash-video');
-const skipButton = document.getElementById('skip-splash');
 const nav = document.querySelector('nav');
 const contactModal = document.getElementById('contact-modal');
 const contactForm = document.getElementById('contact-form');
@@ -33,26 +26,34 @@ function initSplash() {
     document.body.style.overflow = 'hidden';
 
     if (splashVideo) {
-        // Check video time and end splash when appropriate
+        // End splash when video reaches 6 seconds
         splashVideo.addEventListener('timeupdate', () => {
-            if (splashVideo.currentTime >= SPLASH_END_TIME) {
+            if (splashVideo.currentTime >= SPLASH_DURATION) {
                 endSplash();
             }
         });
 
-        // Fallback: end splash when video ends
+        // Fallback: end splash when video ends (in case video is shorter)
         splashVideo.addEventListener('ended', endSplash);
 
-        // If video fails to load, end splash after a timeout
+        // If video fails to load, end splash after the duration
         splashVideo.addEventListener('error', () => {
-            console.warn('Splash video failed to load, skipping splash screen');
+            console.warn('Splash video failed to load, ending splash screen');
             setTimeout(endSplash, 500);
         });
-    }
 
-    // Skip button
-    if (skipButton) {
-        skipButton.addEventListener('click', endSplash);
+        // Ensure video plays (handle autoplay restrictions)
+        const playPromise = splashVideo.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(() => {
+                // Autoplay was prevented, end splash immediately
+                console.warn('Autoplay prevented, skipping splash');
+                endSplash();
+            });
+        }
+    } else {
+        // No video element found, end splash after duration
+        setTimeout(endSplash, SPLASH_DURATION * 1000);
     }
 }
 
@@ -153,26 +154,8 @@ function initScrollAnimations() {
     });
 }
 
-// ============ DYNAMIC ASSET LOADING ============
-function loadAssets() {
-    // Update logo images
-    document.querySelectorAll('img[data-asset="logo"]').forEach(img => {
-        img.src = ASSETS.logo;
-    });
-
-    // Update splash video
-    const videoSource = document.querySelector('#splash-video source');
-    if (videoSource) {
-        videoSource.src = ASSETS.splashVideo;
-        splashVideo.load();
-    }
-}
-
 // ============ INITIALIZE ============
 document.addEventListener('DOMContentLoaded', () => {
-    // Uncomment the line below if you want to load assets dynamically
-    // loadAssets();
-    
     initSplash();
     initNavigation();
     initModal();
