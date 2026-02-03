@@ -15,9 +15,18 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Splash Screen - Shows first, video autoplays for 6 seconds -->
+    <!-- Splash Screen - Video autoplays for 6 seconds -->
     <div id="splash-screen">
-        <video id="splash-video" autoplay muted playsinline disablePictureInPicture preload="auto">
+        <video id="splash-video" 
+               autoplay 
+               muted 
+               playsinline 
+               disablePictureInPicture
+               preload="auto"
+               webkit-playsinline="true"
+               x5-playsinline="true"
+               x5-video-player-type="h5"
+               x5-video-player-fullscreen="true">
             <source src="omega-splash.mp4" type="video/mp4">
         </video>
     </div>
@@ -27,7 +36,7 @@
         <!-- Navigation -->
         <nav>
             <div class="nav-logo">
-                <img src="omega-logo.png" alt="Rae Logo">
+                <img src="omega-logo.png" alt="Omega Logo">
                 <span>OMEGA</span>
             </div>
             <ul class="nav-links">
@@ -378,7 +387,7 @@
         </div>
     </div>
 
-    <!-- JavaScript - MUST be at end of body -->
+    <!-- JavaScript -->
     <script src="script.js"></script>
 </body>
 </html>
