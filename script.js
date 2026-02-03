@@ -2,7 +2,12 @@
 const SPLASH_DURATION = 6; // seconds
 
 // ============ SPLASH SCREEN ============
+let splashEnded = false;
+
 function endSplash() {
+    if (splashEnded) return; // Prevent multiple calls
+    splashEnded = true;
+    
     const splashScreen = document.getElementById('splash-screen');
     const mainContent = document.getElementById('main-content');
     const splashVideo = document.getElementById('splash-video');
@@ -10,6 +15,7 @@ function endSplash() {
     // Stop the video
     if (splashVideo) {
         splashVideo.pause();
+        splashVideo.currentTime = 0;
     }
     
     // Hide splash screen
@@ -26,40 +32,30 @@ function endSplash() {
     document.body.style.overflow = 'auto';
 }
 
-function forceVideoPlay(video) {
-    // Multiple attempts to play the video
-    const playVideo = () => {
-        video.muted = true; // Ensure muted (required for autoplay)
-        
-        const playPromise = video.play();
-        
-        if (playPromise !== undefined) {
-            playPromise.then(() => {
-                console.log('Video playing successfully');
-            }).catch((error) => {
-                console.log('Play attempt failed, retrying...', error);
-                // Retry after a short delay
-                setTimeout(() => {
-                    video.play().catch(e => console.log('Retry failed:', e));
-                }, 100);
-            });
-        }
-    };
+function playVideo(video) {
+    // Ensure all autoplay-required attributes are set
+    video.muted = true;
+    video.playsInline = true;
+    video.autoplay = true;
+    video.controls = false;
+    video.removeAttribute('controls');
     
-    // Try to play immediately
-    playVideo();
+    // Try to play
+    const playPromise = video.play();
     
-    // Also try on user interaction (backup for strict browsers)
-    const playOnInteraction = () => {
-        playVideo();
-        document.removeEventListener('click', playOnInteraction);
-        document.removeEventListener('touchstart', playOnInteraction);
-        document.removeEventListener('scroll', playOnInteraction);
-    };
-    
-    document.addEventListener('click', playOnInteraction, { once: true });
-    document.addEventListener('touchstart', playOnInteraction, { once: true });
-    document.addEventListener('scroll', playOnInteraction, { once: true });
+    if (playPromise !== undefined) {
+        playPromise.then(() => {
+            console.log('✓ Video autoplay started successfully');
+        }).catch((error) => {
+            console.log('Autoplay blocked, trying again...', error.message);
+            // Try again after a tiny delay
+            setTimeout(() => {
+                video.play().catch(e => {
+                    console.log('Second attempt failed:', e.message);
+                });
+            }, 50);
+        });
+    }
 }
 
 function initSplash() {
@@ -68,42 +64,39 @@ function initSplash() {
     // Prevent scrolling during splash
     document.body.style.overflow = 'hidden';
     
-    // Set a guaranteed timer to end splash after 6 seconds
-    const splashTimer = setTimeout(() => {
-        endSplash();
-    }, SPLASH_DURATION * 1000);
+    // Guaranteed end after 6 seconds
+    setTimeout(endSplash, SPLASH_DURATION * 1000);
     
     if (splashVideo) {
-        // Ensure video attributes are set
+        // Remove controls attribute completely
+        splashVideo.removeAttribute('controls');
+        splashVideo.controls = false;
+        
+        // Set required attributes for autoplay
         splashVideo.muted = true;
         splashVideo.playsInline = true;
         splashVideo.autoplay = true;
         
-        // Remove any controls
-        splashVideo.controls = false;
-        splashVideo.removeAttribute('controls');
-        
-        // Wait for video to be ready, then force play
-        if (splashVideo.readyState >= 2) {
-            // Video is already loaded enough
-            forceVideoPlay(splashVideo);
+        // Play based on ready state
+        if (splashVideo.readyState >= 3) {
+            // Video is ready to play
+            playVideo(splashVideo);
         } else {
-            // Wait for video to load
-            splashVideo.addEventListener('loadeddata', () => {
-                forceVideoPlay(splashVideo);
+            // Wait for video to be ready
+            splashVideo.addEventListener('canplay', function onCanPlay() {
+                playVideo(splashVideo);
+                splashVideo.removeEventListener('canplay', onCanPlay);
             });
             
-            // Also try on canplay
-            splashVideo.addEventListener('canplay', () => {
-                forceVideoPlay(splashVideo);
+            // Also try on loadeddata
+            splashVideo.addEventListener('loadeddata', function onLoaded() {
+                playVideo(splashVideo);
+                splashVideo.removeEventListener('loadeddata', onLoaded);
             });
         }
         
-        // End when video ends (backup)
-        splashVideo.addEventListener('ended', () => {
-            clearTimeout(splashTimer);
-            endSplash();
-        });
+        // End splash when video ends (if shorter than 6 seconds)
+        splashVideo.addEventListener('ended', endSplash);
     }
 }
 
@@ -158,7 +151,6 @@ function initModal() {
     const contactModal = document.getElementById('contact-modal');
     const contactForm = document.getElementById('contact-form');
     
-    // Close modal on outside click
     if (contactModal) {
         contactModal.addEventListener('click', (e) => {
             if (e.target.id === 'contact-modal') {
@@ -167,14 +159,12 @@ function initModal() {
         });
     }
 
-    // Close modal on escape key
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             closeModal();
         }
     });
 
-    // Form submission
     if (contactForm) {
         contactForm.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -209,18 +199,18 @@ function initScrollAnimations() {
     });
 }
 
-// ============ INITIALIZE ============
-// Start as early as possible
+// ============ INITIALIZE - RUN IMMEDIATELY ============
+// Run splash as early as possible
+initSplash();
+
+// Run other initializations when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-        initSplash();
         initNavigation();
         initModal();
         initScrollAnimations();
     });
 } else {
-    // DOM already loaded
-    initSplash();
     initNavigation();
     initModal();
     initScrollAnimations();
