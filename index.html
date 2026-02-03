@@ -15,23 +15,33 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Splash Screen - Video autoplays for 6 seconds -->
+    <!-- Splash Screen -->
     <div id="splash-screen">
-        <video id="splash-video" 
-               autoplay 
-               muted 
-               playsinline 
-               disablePictureInPicture
-               preload="auto"
-               webkit-playsinline="true"
-               x5-playsinline="true"
-               x5-video-player-type="h5"
-               x5-video-player-fullscreen="true">
-            <source src="omega-splash.mp4" type="video/mp4">
-        </video>
+        <div class="video-container">
+            <video id="splash-video" 
+                   autoplay 
+                   muted 
+                   playsinline
+                   disablePictureInPicture
+                   preload="auto"
+                   webkit-playsinline="true">
+                <source src="omega-splash.mp4" type="video/mp4">
+            </video>
+        </div>
     </div>
+    
+    <!-- Inline script to start video IMMEDIATELY -->
+    <script>
+        (function() {
+            var video = document.getElementById('splash-video');
+            if (video) {
+                video.muted = true;
+                video.play().catch(function(){});
+            }
+        })();
+    </script>
 
-    <!-- Main Content - Hidden initially, fades in after splash -->
+    <!-- Main Content -->
     <div id="main-content">
         <!-- Navigation -->
         <nav>
@@ -387,7 +397,7 @@
         </div>
     </div>
 
-    <!-- JavaScript -->
+    <!-- Main JavaScript -->
     <script src="script.js"></script>
 </body>
 </html>
