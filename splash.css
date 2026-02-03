@@ -40,4 +40,42 @@
     height: 100%;
     object-fit: cover;
     pointer-events: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+/* Hide all video controls across browsers */
+#splash-video::-webkit-media-controls {
+    display: none !important;
+}
+
+#splash-video::-webkit-media-controls-enclosure {
+    display: none !important;
+}
+
+#splash-video::-webkit-media-controls-panel {
+    display: none !important;
+}
+
+#splash-video::-webkit-media-controls-play-button {
+    display: none !important;
+}
+
+#splash-video::-webkit-media-controls-start-playback-button {
+    display: none !important;
+}
+
+#splash-video::-webkit-media-controls-overlay-play-button {
+    display: none !important;
+}
+
+/* Firefox */
+#splash-video::-moz-media-controls {
+    display: none !important;
+}
+
+/* Microsoft Edge */
+#splash-video::-ms-media-controls {
+    display: none !important;
 }
