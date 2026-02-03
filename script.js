@@ -1,64 +1,64 @@
 // ============ CONFIGURATION ============
-// Splash screen duration in seconds
-const SPLASH_DURATION = 6;
-
-// ============ DOM ELEMENTS ============
-const splashScreen = document.getElementById('splash-screen');
-const mainContent = document.getElementById('main-content');
-const splashVideo = document.getElementById('splash-video');
-const nav = document.querySelector('nav');
-const contactModal = document.getElementById('contact-modal');
-const contactForm = document.getElementById('contact-form');
+const SPLASH_DURATION = 6; // seconds
 
 // ============ SPLASH SCREEN ============
 function endSplash() {
+    const splashScreen = document.getElementById('splash-screen');
+    const mainContent = document.getElementById('main-content');
+    const splashVideo = document.getElementById('splash-video');
+    
+    // Stop the video
+    if (splashVideo) {
+        splashVideo.pause();
+    }
+    
+    // Hide splash screen
     if (splashScreen) {
         splashScreen.classList.add('hidden');
     }
+    
+    // Show main content with fade in
     if (mainContent) {
         mainContent.classList.add('visible');
     }
+    
+    // Re-enable scrolling
     document.body.style.overflow = 'auto';
 }
 
 function initSplash() {
+    const splashScreen = document.getElementById('splash-screen');
+    const splashVideo = document.getElementById('splash-video');
+    
     // Prevent scrolling during splash
     document.body.style.overflow = 'hidden';
-
+    
+    // Set a guaranteed timer to end splash after 6 seconds
+    const splashTimer = setTimeout(() => {
+        endSplash();
+    }, SPLASH_DURATION * 1000);
+    
     if (splashVideo) {
-        // End splash when video reaches 6 seconds
-        splashVideo.addEventListener('timeupdate', () => {
-            if (splashVideo.currentTime >= SPLASH_DURATION) {
-                endSplash();
-            }
+        // Try to play the video
+        splashVideo.play().then(() => {
+            console.log('Splash video playing');
+        }).catch((error) => {
+            console.warn('Autoplay failed:', error);
+            // Video couldn't autoplay, but timer will still end splash
         });
-
-        // Fallback: end splash when video ends (in case video is shorter)
-        splashVideo.addEventListener('ended', endSplash);
-
-        // If video fails to load, end splash after the duration
-        splashVideo.addEventListener('error', () => {
-            console.warn('Splash video failed to load, ending splash screen');
-            setTimeout(endSplash, 500);
+        
+        // Also end when video ends (backup)
+        splashVideo.addEventListener('ended', () => {
+            clearTimeout(splashTimer);
+            endSplash();
         });
-
-        // Ensure video plays (handle autoplay restrictions)
-        const playPromise = splashVideo.play();
-        if (playPromise !== undefined) {
-            playPromise.catch(() => {
-                // Autoplay was prevented, end splash immediately
-                console.warn('Autoplay prevented, skipping splash');
-                endSplash();
-            });
-        }
-    } else {
-        // No video element found, end splash after duration
-        setTimeout(endSplash, SPLASH_DURATION * 1000);
     }
 }
 
 // ============ NAVIGATION ============
 function initNavigation() {
+    const nav = document.querySelector('nav');
+    
     if (nav) {
         window.addEventListener('scroll', () => {
             if (window.scrollY > 50) {
@@ -87,6 +87,7 @@ function initNavigation() {
 
 // ============ MODAL ============
 function openModal() {
+    const contactModal = document.getElementById('contact-modal');
     if (contactModal) {
         contactModal.classList.add('active');
         document.body.style.overflow = 'hidden';
@@ -94,6 +95,7 @@ function openModal() {
 }
 
 function closeModal() {
+    const contactModal = document.getElementById('contact-modal');
     if (contactModal) {
         contactModal.classList.remove('active');
         document.body.style.overflow = 'auto';
@@ -101,6 +103,9 @@ function closeModal() {
 }
 
 function initModal() {
+    const contactModal = document.getElementById('contact-modal');
+    const contactForm = document.getElementById('contact-form');
+    
     // Close modal on outside click
     if (contactModal) {
         contactModal.addEventListener('click', (e) => {
@@ -112,7 +117,7 @@ function initModal() {
 
     // Close modal on escape key
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && contactModal?.classList.contains('active')) {
+        if (e.key === 'Escape') {
             closeModal();
         }
     });
@@ -121,7 +126,6 @@ function initModal() {
     if (contactForm) {
         contactForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            // You can add your form handling logic here (e.g., send to API)
             alert('Thank you for your message! We\'ll be in touch soon.');
             closeModal();
             contactForm.reset();
@@ -145,7 +149,6 @@ function initScrollAnimations() {
         });
     }, observerOptions);
 
-    // Animate service cards, stats, and process steps
     document.querySelectorAll('.service-card, .stat-item, .process-step').forEach(el => {
         el.style.opacity = '0';
         el.style.transform = 'translateY(30px)';
@@ -162,6 +165,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initScrollAnimations();
 });
 
-// Make modal functions globally available for onclick handlers
+// Make modal functions globally available
 window.openModal = openModal;
 window.closeModal = closeModal;
