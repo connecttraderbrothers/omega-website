@@ -26,8 +26,43 @@ function endSplash() {
     document.body.style.overflow = 'auto';
 }
 
+function forceVideoPlay(video) {
+    // Multiple attempts to play the video
+    const playVideo = () => {
+        video.muted = true; // Ensure muted (required for autoplay)
+        
+        const playPromise = video.play();
+        
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                console.log('Video playing successfully');
+            }).catch((error) => {
+                console.log('Play attempt failed, retrying...', error);
+                // Retry after a short delay
+                setTimeout(() => {
+                    video.play().catch(e => console.log('Retry failed:', e));
+                }, 100);
+            });
+        }
+    };
+    
+    // Try to play immediately
+    playVideo();
+    
+    // Also try on user interaction (backup for strict browsers)
+    const playOnInteraction = () => {
+        playVideo();
+        document.removeEventListener('click', playOnInteraction);
+        document.removeEventListener('touchstart', playOnInteraction);
+        document.removeEventListener('scroll', playOnInteraction);
+    };
+    
+    document.addEventListener('click', playOnInteraction, { once: true });
+    document.addEventListener('touchstart', playOnInteraction, { once: true });
+    document.addEventListener('scroll', playOnInteraction, { once: true });
+}
+
 function initSplash() {
-    const splashScreen = document.getElementById('splash-screen');
     const splashVideo = document.getElementById('splash-video');
     
     // Prevent scrolling during splash
@@ -39,15 +74,32 @@ function initSplash() {
     }, SPLASH_DURATION * 1000);
     
     if (splashVideo) {
-        // Try to play the video
-        splashVideo.play().then(() => {
-            console.log('Splash video playing');
-        }).catch((error) => {
-            console.warn('Autoplay failed:', error);
-            // Video couldn't autoplay, but timer will still end splash
-        });
+        // Ensure video attributes are set
+        splashVideo.muted = true;
+        splashVideo.playsInline = true;
+        splashVideo.autoplay = true;
         
-        // Also end when video ends (backup)
+        // Remove any controls
+        splashVideo.controls = false;
+        splashVideo.removeAttribute('controls');
+        
+        // Wait for video to be ready, then force play
+        if (splashVideo.readyState >= 2) {
+            // Video is already loaded enough
+            forceVideoPlay(splashVideo);
+        } else {
+            // Wait for video to load
+            splashVideo.addEventListener('loadeddata', () => {
+                forceVideoPlay(splashVideo);
+            });
+            
+            // Also try on canplay
+            splashVideo.addEventListener('canplay', () => {
+                forceVideoPlay(splashVideo);
+            });
+        }
+        
+        // End when video ends (backup)
         splashVideo.addEventListener('ended', () => {
             clearTimeout(splashTimer);
             endSplash();
@@ -158,12 +210,21 @@ function initScrollAnimations() {
 }
 
 // ============ INITIALIZE ============
-document.addEventListener('DOMContentLoaded', () => {
+// Start as early as possible
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        initSplash();
+        initNavigation();
+        initModal();
+        initScrollAnimations();
+    });
+} else {
+    // DOM already loaded
     initSplash();
     initNavigation();
     initModal();
     initScrollAnimations();
-});
+}
 
 // Make modal functions globally available
 window.openModal = openModal;
