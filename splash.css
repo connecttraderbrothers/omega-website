@@ -1,5 +1,18 @@
 /* ============ SPLASH SCREEN STYLES ============ */
 
+/* Hide main content initially - IMPORTANT */
+#main-content {
+    opacity: 0;
+    visibility: hidden;
+}
+
+#main-content.visible {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 1s ease, visibility 1s ease;
+}
+
+/* Splash screen - covers everything */
 #splash-screen {
     position: fixed;
     top: 0;
@@ -11,6 +24,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    opacity: 1;
+    visibility: visible;
     transition: opacity 0.8s ease, visibility 0.8s ease;
 }
 
@@ -24,5 +39,5 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    pointer-events: none; /* Prevents any interaction with video */
+    pointer-events: none;
 }
