@@ -198,25 +198,29 @@ export default function Hero() {
                 }}
               >
                 {/* Glow Effect Behind Logo */}
-                <div className="absolute inset-0 bg-neon-yellow/30 blur-[100px] rounded-full scale-90 animate-pulse-glow" />
-                
-                {/* Circular Logo */}
-                <img
-                  ref={imageRef}
-                  src="/logo-circular.png"
-                  alt="Omega Digital"
-                  className="relative z-10 w-full max-w-md mx-auto rounded-full shadow-2xl"
-                />
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="w-[66%] h-[66%] bg-neon-yellow/30 blur-[100px] rounded-full animate-pulse-glow" />
+                </div>
 
-                {/* Decorative Rings */}
+                {/* Decorative Rings — outermost = full container */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="w-[110%] h-[110%] border-2 border-neon-yellow/30 rounded-full animate-pulse-glow" />
+                  <div className="w-full h-full border border-neon-cyan/10 rounded-full animate-pulse-glow" style={{ animationDelay: '1s' }} />
                 </div>
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="w-[130%] h-[130%] border border-neon-yellow/15 rounded-full animate-pulse-glow" style={{ animationDelay: '0.5s' }} />
+                  <div className="w-[86%] h-[86%] border border-neon-yellow/15 rounded-full animate-pulse-glow" style={{ animationDelay: '0.5s' }} />
                 </div>
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="w-[150%] h-[150%] border border-neon-cyan/10 rounded-full animate-pulse-glow" style={{ animationDelay: '1s' }} />
+                  <div className="w-[73%] h-[73%] border-2 border-neon-yellow/30 rounded-full animate-pulse-glow" />
+                </div>
+
+                {/* Circular Logo — sized to sit inside the rings */}
+                <div className="relative z-10 flex items-center justify-center p-[17%]">
+                  <img
+                    ref={imageRef}
+                    src="/logo-circular.png"
+                    alt="Omega Digital"
+                    className="w-full rounded-full shadow-2xl"
+                  />
                 </div>
               </div>
             </div>
