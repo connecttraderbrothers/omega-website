@@ -68,9 +68,9 @@ export default function Footer() {
               <a href="#hero" className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-neon-yellow/50 hover:border-neon-yellow transition-colors">
                   <img 
-                    src="/logo-circular.png" 
+                    src="/hero-logo.jpg" 
                     alt="Omega Digital Logo" 
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover object-center"
                   />
                 </div>
                 <div>
