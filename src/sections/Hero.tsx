@@ -184,14 +184,14 @@ export default function Hero() {
               </div>
             </div>
 
-            {/* Right Content - Circular Logo */}
+            {/* Right Content - Hero Logo */}
             <div
               className={`relative order-1 lg:order-2 transition-all duration-1500 delay-300 ${
                 isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
               }`}
             >
               <div
-                className="relative"
+                className="relative max-w-md mx-auto"
                 style={{
                   transform: `perspective(1000px) rotateY(${mousePosition.x}deg) rotateX(${-mousePosition.y}deg)`,
                   transition: 'transform 0.3s ease-out',
@@ -199,29 +199,21 @@ export default function Hero() {
               >
                 {/* Glow Effect Behind Logo */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="w-[66%] h-[66%] bg-neon-yellow/30 blur-[100px] rounded-full animate-pulse-glow" />
+                  <div className="w-[70%] h-[70%] bg-neon-yellow/25 blur-[80px] rounded-full animate-pulse-glow" />
                 </div>
 
-                {/* Decorative Rings — outermost = full container */}
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="w-full h-full border border-neon-cyan/10 rounded-full animate-pulse-glow" style={{ animationDelay: '1s' }} />
-                </div>
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="w-[86%] h-[86%] border border-neon-yellow/15 rounded-full animate-pulse-glow" style={{ animationDelay: '0.5s' }} />
-                </div>
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="w-[73%] h-[73%] border-2 border-neon-yellow/30 rounded-full animate-pulse-glow" />
-                </div>
-
-                {/* Circular Logo — sized to sit inside the rings */}
-                <div className="relative z-10 flex items-center justify-center p-[17%]">
+                {/* Hero Logo — circular crop showing the golden rings and centered Omega */}
+                <div className="relative z-10 w-full aspect-square rounded-full overflow-hidden shadow-2xl">
                   <img
                     ref={imageRef}
-                    src="/logo-circular.png"
+                    src="/hero-logo.jpg"
                     alt="Omega Digital"
-                    className="w-full rounded-full shadow-2xl"
+                    className="absolute inset-0 w-full h-full object-cover object-center"
                   />
                 </div>
+
+                {/* Subtle outer glow ring */}
+                <div className="absolute inset-[-4%] rounded-full border border-neon-yellow/10 pointer-events-none animate-pulse-glow" style={{ animationDelay: '1s' }} />
               </div>
             </div>
           </div>
