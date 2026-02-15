@@ -70,9 +70,9 @@ export default function Navigation({ scrollY }: NavigationProps) {
             >
               <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-neon-yellow/50 group-hover:border-neon-yellow group-hover:shadow-neon transition-all duration-300">
                 <img 
-                  src="/hero-logo.jpg" 
+                  src="/hero-logo-circle.png" 
                   alt="Omega Digital Logo" 
-                  className="w-[130%] h-[130%] object-cover object-center -ml-[15%] -mt-[15%]"
+                  className="w-full h-full object-cover"
                 />
               </div>
               <span className="font-semibold text-lg tracking-wider hidden sm:block">
