@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { ChevronDown, ArrowRight } from 'lucide-react';
 
 export default function Hero() {
@@ -7,14 +7,80 @@ export default function Hero() {
   const heroRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const directionRef = useRef<'forward' | 'reverse'>('forward');
+  const rafRef = useRef<number | null>(null);
+
+  // Reverse playback using requestAnimationFrame for cross-browser support
+  const stepReverse = useCallback(() => {
+    const video = videoRef.current;
+    if (!video || directionRef.current !== 'reverse') return;
+
+    if (video.currentTime <= 0.05) {
+      // Reached the start — switch back to forward
+      directionRef.current = 'forward';
+      video.currentTime = 0;
+      video.play().catch(() => {});
+      return;
+    }
+
+    // Step backwards ~30fps
+    video.currentTime = Math.max(0, video.currentTime - 0.033);
+    rafRef.current = requestAnimationFrame(stepReverse);
+  }, []);
 
   useEffect(() => {
     setIsLoaded(true);
-    // Force-play video in case autoPlay is blocked by browser
-    if (videoRef.current) {
-      videoRef.current.play().catch(() => {});
-    }
-  }, []);
+
+    const video = videoRef.current;
+    if (!video) return;
+
+    // Force muted (required for autoplay on most browsers)
+    video.muted = true;
+    video.defaultMuted = true;
+
+    // Handle end of video — start reverse playback
+    const handleEnded = () => {
+      directionRef.current = 'reverse';
+      video.pause();
+      rafRef.current = requestAnimationFrame(stepReverse);
+    };
+
+    video.addEventListener('ended', handleEnded);
+
+    // Attempt autoplay with multiple fallback strategies
+    const tryPlay = () => {
+      video.play().catch(() => {
+        // Some browsers need a tiny delay
+        setTimeout(() => {
+          video.play().catch(() => {});
+        }, 100);
+      });
+    };
+
+    // Try playing immediately
+    tryPlay();
+
+    // Also try on canplay event as fallback
+    video.addEventListener('canplay', tryPlay, { once: true });
+
+    // Also try on user interaction as last resort (for strict browsers)
+    const handleInteraction = () => {
+      if (video.paused && directionRef.current === 'forward') {
+        video.play().catch(() => {});
+      }
+    };
+    document.addEventListener('click', handleInteraction, { once: true });
+    document.addEventListener('touchstart', handleInteraction, { once: true });
+    document.addEventListener('scroll', handleInteraction, { once: true });
+
+    return () => {
+      video.removeEventListener('ended', handleEnded);
+      document.removeEventListener('click', handleInteraction);
+      document.removeEventListener('touchstart', handleInteraction);
+      document.removeEventListener('scroll', handleInteraction);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, [stepReverse]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -48,13 +114,13 @@ export default function Hero() {
         <video
           ref={videoRef}
           autoPlay
-          loop
           muted
           playsInline
           controls={false}
           disablePictureInPicture
+          disableRemotePlayback
           poster="/hero-bg-poster.jpg"
-          className="w-full h-full object-cover pointer-events-none"
+          className="w-full h-full object-cover pointer-events-none select-none"
           style={{
             transform: `translate(${mousePosition.x * -0.3}px, ${mousePosition.y * -0.3}px) scale(1.1)`,
             transition: 'transform 0.5s ease-out',
