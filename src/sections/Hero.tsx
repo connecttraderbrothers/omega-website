@@ -343,7 +343,7 @@ export default function Hero() {
               }`}
             >
               <div
-                className="relative max-w-md mx-auto"
+                className="relative max-w-xs sm:max-w-sm mx-auto"
                 style={{
                   transform: `perspective(1000px) rotateY(${mousePosition.x}deg) rotateX(${-mousePosition.y}deg)`,
                   transition: 'transform 0.3s ease-out',
@@ -354,18 +354,18 @@ export default function Hero() {
                   <div className="w-[70%] h-[70%] bg-neon-yellow/25 blur-[80px] rounded-full animate-pulse-glow" />
                 </div>
 
-                {/* Hero Logo — pre-cropped circle with golden rings at the edge */}
-                <div className="relative z-10 w-full aspect-square">
+                {/* Hero Logo — tightly clipped so golden rings touch the edge */}
+                <div className="relative z-10 w-full aspect-square rounded-full overflow-hidden">
                   <img
                     ref={imageRef}
                     src="/hero-logo-circle.png"
                     alt="Omega Digital"
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-cover"
                   />
                 </div>
 
                 {/* Subtle outer glow ring */}
-                <div className="absolute inset-[-4%] rounded-full border border-neon-yellow/10 pointer-events-none animate-pulse-glow" style={{ animationDelay: '1s' }} />
+                <div className="absolute inset-[-3%] rounded-full border border-neon-yellow/10 pointer-events-none animate-pulse-glow" style={{ animationDelay: '1s' }} />
               </div>
             </div>
           </div>
