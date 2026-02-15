@@ -335,23 +335,73 @@
   color: #fff;
 }
 
-/* Hide native video controls */
+/* Hide native video controls — all browsers */
+video {
+  -webkit-appearance: none;
+}
+
 video::-webkit-media-controls {
   display: none !important;
+  -webkit-appearance: none;
 }
 
 video::-webkit-media-controls-panel {
   display: none !important;
+  -webkit-appearance: none;
 }
 
 video::-webkit-media-controls-play-button {
   display: none !important;
+  -webkit-appearance: none;
 }
 
 video::-webkit-media-controls-start-playback-button {
+  display: none !important;
+  -webkit-appearance: none;
+}
+
+video::-webkit-media-controls-overlay-play-button {
+  display: none !important;
+  -webkit-appearance: none;
+}
+
+video::-webkit-media-controls-enclosure {
+  display: none !important;
+}
+
+video::-webkit-media-controls-timeline {
+  display: none !important;
+}
+
+video::-webkit-media-controls-current-time-display {
+  display: none !important;
+}
+
+video::-webkit-media-controls-time-remaining-display {
+  display: none !important;
+}
+
+video::-webkit-media-controls-volume-slider {
+  display: none !important;
+}
+
+video::-webkit-media-controls-mute-button {
+  display: none !important;
+}
+
+video::-webkit-media-controls-fullscreen-button {
   display: none !important;
 }
 
 video::-moz-media-controls {
   display: none !important;
+}
+
+video::-ms-media-controls {
+  display: none !important;
+}
+
+/* Prevent any interaction with video */
+video[poster] {
+  object-fit: cover;
 }
