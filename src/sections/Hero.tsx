@@ -29,8 +29,6 @@ export default function Hero() {
   }, []);
 
   useEffect(() => {
-    setIsLoaded(true);
-
     const video = videoRef.current;
     if (!video) return;
 
@@ -47,23 +45,19 @@ export default function Hero() {
 
     video.addEventListener('ended', handleEnded);
 
-    // Attempt autoplay with multiple fallback strategies
+    // Start playing immediately (behind splash screen)
     const tryPlay = () => {
       video.play().catch(() => {
-        // Some browsers need a tiny delay
         setTimeout(() => {
           video.play().catch(() => {});
         }, 100);
       });
     };
 
-    // Try playing immediately
     tryPlay();
-
-    // Also try on canplay event as fallback
     video.addEventListener('canplay', tryPlay, { once: true });
 
-    // Also try on user interaction as last resort (for strict browsers)
+    // Fallback: play on any user interaction
     const handleInteraction = () => {
       if (video.paused && directionRef.current === 'forward') {
         video.play().catch(() => {});
@@ -73,12 +67,18 @@ export default function Hero() {
     document.addEventListener('touchstart', handleInteraction, { once: true });
     document.addEventListener('scroll', handleInteraction, { once: true });
 
+    // Delay hero content animations until after splash screen finishes (~5.2s)
+    const splashTimer = setTimeout(() => {
+      setIsLoaded(true);
+    }, 5200);
+
     return () => {
       video.removeEventListener('ended', handleEnded);
       document.removeEventListener('click', handleInteraction);
       document.removeEventListener('touchstart', handleInteraction);
       document.removeEventListener('scroll', handleInteraction);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      clearTimeout(splashTimer);
     };
   }, [stepReverse]);
 
