@@ -7,10 +7,61 @@ export default function Hero() {
   const heroRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const directionRef = useRef<'forward' | 'reverse'>('forward');
-  const rafRef = useRef<number | null>(null);
+  const drawRafRef = useRef<number | null>(null);
+  const reverseRafRef = useRef<number | null>(null);
 
-  // Reverse playback using requestAnimationFrame for cross-browser support
+  // ─── Draw video frame onto canvas (object-fit: cover) ───
+  const drawFrame = useCallback(() => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    if (!video || !canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Match canvas size to its display size
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    const cw = rect.width * dpr;
+    const ch = rect.height * dpr;
+
+    if (canvas.width !== cw || canvas.height !== ch) {
+      canvas.width = cw;
+      canvas.height = ch;
+    }
+
+    // Only draw if video has data
+    if (video.readyState >= 2) {
+      const vw = video.videoWidth;
+      const vh = video.videoHeight;
+
+      if (vw && vh) {
+        // Calculate object-fit: cover crop
+        const canvasRatio = cw / ch;
+        const videoRatio = vw / vh;
+
+        let sx = 0, sy = 0, sw = vw, sh = vh;
+
+        if (videoRatio > canvasRatio) {
+          // Video is wider — crop sides
+          sw = vh * canvasRatio;
+          sx = (vw - sw) / 2;
+        } else {
+          // Video is taller — crop top/bottom
+          sh = vw / canvasRatio;
+          sy = (vh - sh) / 2;
+        }
+
+        ctx.drawImage(video, sx, sy, sw, sh, 0, 0, cw, ch);
+      }
+    }
+
+    drawRafRef.current = requestAnimationFrame(drawFrame);
+  }, []);
+
+  // ─── Reverse playback by stepping currentTime backwards ───
   const stepReverse = useCallback(() => {
     const video = videoRef.current;
     if (!video || directionRef.current !== 'reverse') return;
@@ -25,39 +76,41 @@ export default function Hero() {
 
     // Step backwards ~30fps
     video.currentTime = Math.max(0, video.currentTime - 0.033);
-    rafRef.current = requestAnimationFrame(stepReverse);
+    reverseRafRef.current = requestAnimationFrame(stepReverse);
   }, []);
 
+  // ─── Video setup + canvas draw loop ───
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    // Force muted (required for autoplay on most browsers)
+    // Force muted (required for autoplay)
     video.muted = true;
     video.defaultMuted = true;
 
-    // Handle end of video — start reverse playback
+    // Handle end of video — start reverse
     const handleEnded = () => {
       directionRef.current = 'reverse';
       video.pause();
-      rafRef.current = requestAnimationFrame(stepReverse);
+      reverseRafRef.current = requestAnimationFrame(stepReverse);
     };
 
     video.addEventListener('ended', handleEnded);
 
-    // Start playing immediately (behind splash screen)
+    // Start canvas draw loop immediately
+    drawRafRef.current = requestAnimationFrame(drawFrame);
+
+    // Attempt autoplay
     const tryPlay = () => {
       video.play().catch(() => {
-        setTimeout(() => {
-          video.play().catch(() => {});
-        }, 100);
+        setTimeout(() => video.play().catch(() => {}), 100);
       });
     };
 
     tryPlay();
     video.addEventListener('canplay', tryPlay, { once: true });
 
-    // Fallback: play on any user interaction
+    // Fallback: play on user interaction
     const handleInteraction = () => {
       if (video.paused && directionRef.current === 'forward') {
         video.play().catch(() => {});
@@ -67,7 +120,7 @@ export default function Hero() {
     document.addEventListener('touchstart', handleInteraction, { once: true });
     document.addEventListener('scroll', handleInteraction, { once: true });
 
-    // Delay hero content animations until after splash screen finishes (~5.2s)
+    // Delay hero content animations until after splash screen (~5.2s)
     const splashTimer = setTimeout(() => {
       setIsLoaded(true);
     }, 5200);
@@ -77,11 +130,13 @@ export default function Hero() {
       document.removeEventListener('click', handleInteraction);
       document.removeEventListener('touchstart', handleInteraction);
       document.removeEventListener('scroll', handleInteraction);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      if (drawRafRef.current) cancelAnimationFrame(drawRafRef.current);
+      if (reverseRafRef.current) cancelAnimationFrame(reverseRafRef.current);
       clearTimeout(splashTimer);
     };
-  }, [stepReverse]);
+  }, [stepReverse, drawFrame]);
 
+  // ─── Mouse parallax ───
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (heroRef.current) {
@@ -109,26 +164,44 @@ export default function Hero() {
       ref={heroRef}
       className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black"
     >
-      {/* Background Video */}
+      {/* Hidden video — data source only, never visible */}
+      <video
+        ref={videoRef}
+        autoPlay
+        muted
+        playsInline
+        preload="auto"
+        className="absolute w-0 h-0 opacity-0 pointer-events-none"
+        style={{ position: 'absolute', top: '-9999px', left: '-9999px' }}
+      >
+        <source src="/omega-background.mp4" type="video/mp4" />
+      </video>
+
+      {/* Canvas background — renders video frames, no controls ever */}
       <div className="absolute inset-0 overflow-hidden">
-        <video
-          ref={videoRef}
-          autoPlay
-          muted
-          playsInline
-          controls={false}
-          disablePictureInPicture
-          disableRemotePlayback
-          poster="/hero-bg-poster.jpg"
-          className="w-full h-full object-cover pointer-events-none select-none"
+        <canvas
+          ref={canvasRef}
+          className="w-full h-full"
           style={{
             transform: `translate(${mousePosition.x * -0.3}px, ${mousePosition.y * -0.3}px) scale(1.1)`,
             transition: 'transform 0.5s ease-out',
           }}
-        >
-          <source src="/omega-background.mp4" type="video/mp4" />
-        </video>
+        />
         {/* Dark overlay for better text readability */}
+        <div className="absolute inset-0 bg-black/60" />
+      </div>
+
+      {/* Poster fallback — shows while video loads, hidden once canvas is drawing */}
+      <div className="absolute inset-0 overflow-hidden">
+        <img
+          src="/hero-bg-poster.jpg"
+          alt=""
+          className="w-full h-full object-cover"
+          style={{
+            transform: `translate(${mousePosition.x * -0.3}px, ${mousePosition.y * -0.3}px) scale(1.1)`,
+            transition: 'transform 0.5s ease-out',
+          }}
+        />
         <div className="absolute inset-0 bg-black/60" />
       </div>
 
