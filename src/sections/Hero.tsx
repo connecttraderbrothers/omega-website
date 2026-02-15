@@ -202,13 +202,13 @@ export default function Hero() {
                   <div className="w-[70%] h-[70%] bg-neon-yellow/25 blur-[80px] rounded-full animate-pulse-glow" />
                 </div>
 
-                {/* Hero Logo — circular crop showing the golden rings and centered Omega */}
+                {/* Hero Logo — circular crop with golden rings at the edge */}
                 <div className="relative z-10 w-full aspect-square rounded-full overflow-hidden shadow-2xl">
                   <img
                     ref={imageRef}
                     src="/hero-logo.jpg"
                     alt="Omega Digital"
-                    className="absolute inset-0 w-full h-full object-cover object-center"
+                    className="absolute inset-[-15%] w-[130%] h-[130%] object-cover object-center"
                   />
                 </div>
 
