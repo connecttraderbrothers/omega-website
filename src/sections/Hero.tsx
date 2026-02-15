@@ -6,9 +6,14 @@ export default function Hero() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const heroRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     setIsLoaded(true);
+    // Force-play video in case autoPlay is blocked by browser
+    if (videoRef.current) {
+      videoRef.current.play().catch(() => {});
+    }
   }, []);
 
   useEffect(() => {
@@ -39,14 +44,17 @@ export default function Hero() {
       className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black"
     >
       {/* Background Video */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 overflow-hidden">
         <video
+          ref={videoRef}
           autoPlay
           loop
           muted
           playsInline
+          controls={false}
+          disablePictureInPicture
           poster="/hero-bg-poster.jpg"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover pointer-events-none"
           style={{
             transform: `translate(${mousePosition.x * -0.3}px, ${mousePosition.y * -0.3}px) scale(1.1)`,
             transition: 'transform 0.5s ease-out',
