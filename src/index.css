@@ -334,3 +334,24 @@
   background: rgba(241, 254, 66, 0.3);
   color: #fff;
 }
+
+/* Hide native video controls */
+video::-webkit-media-controls {
+  display: none !important;
+}
+
+video::-webkit-media-controls-panel {
+  display: none !important;
+}
+
+video::-webkit-media-controls-play-button {
+  display: none !important;
+}
+
+video::-webkit-media-controls-start-playback-button {
+  display: none !important;
+}
+
+video::-moz-media-controls {
+  display: none !important;
+}
