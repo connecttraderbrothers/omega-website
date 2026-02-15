@@ -38,17 +38,22 @@ export default function Hero() {
       ref={heroRef}
       className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black"
     >
-      {/* Original Logo Background Image */}
+      {/* Background Video */}
       <div className="absolute inset-0">
-        <img
-          src="/hero-bg.jpg"
-          alt=""
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          poster="/hero-bg-poster.jpg"
           className="w-full h-full object-cover"
           style={{
             transform: `translate(${mousePosition.x * -0.3}px, ${mousePosition.y * -0.3}px) scale(1.1)`,
             transition: 'transform 0.5s ease-out',
           }}
-        />
+        >
+          <source src="/omega-background.mp4" type="video/mp4" />
+        </video>
         {/* Dark overlay for better text readability */}
         <div className="absolute inset-0 bg-black/60" />
       </div>
