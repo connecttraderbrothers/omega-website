@@ -70,7 +70,7 @@ export default function Footer() {
                   <img 
                     src="/hero-logo.jpg" 
                     alt="Omega Digital Logo" 
-                    className="w-full h-full object-cover object-center"
+                    className="w-[130%] h-[130%] object-cover object-center -ml-[15%] -mt-[15%]"
                   />
                 </div>
                 <div>
