@@ -142,7 +142,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <div className="text-sm text-white/50">Location</div>
-                    <div className="text-white">New York, NY</div>
+                    <div className="text-white">Edinburgh, Scotland</div>
                   </div>
                 </div>
               </div>
