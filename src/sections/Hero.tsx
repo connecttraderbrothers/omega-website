@@ -301,10 +301,10 @@ export default function Hero() {
                 }`}
               >
                 <button
-                  onClick={() => scrollToSection('#works')}
+                  onClick={() => scrollToSection('#services')}
                   className="group px-8 py-4 bg-neon-yellow text-black font-semibold rounded-full hover:shadow-neon-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2"
                 >
-                  Explore Work
+                  Explore Services
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </button>
                 <button
@@ -313,26 +313,6 @@ export default function Hero() {
                 >
                   Start Project
                 </button>
-              </div>
-
-              {/* Stats */}
-              <div
-                className={`grid grid-cols-3 gap-8 mt-16 pt-8 border-t border-white/10 transition-all duration-1000 delay-1000 ${
-                  isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-                }`}
-              >
-                <div>
-                  <div className="text-3xl sm:text-4xl font-bold text-neon-yellow">150+</div>
-                  <div className="text-sm text-white/50 mt-1">Projects</div>
-                </div>
-                <div>
-                  <div className="text-3xl sm:text-4xl font-bold text-neon-yellow">50+</div>
-                  <div className="text-sm text-white/50 mt-1">Clients</div>
-                </div>
-                <div>
-                  <div className="text-3xl sm:text-4xl font-bold text-neon-yellow">8+</div>
-                  <div className="text-sm text-white/50 mt-1">Years</div>
-                </div>
               </div>
             </div>
 
