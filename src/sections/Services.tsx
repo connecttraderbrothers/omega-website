@@ -43,10 +43,10 @@ const services = [
   },
   {
     id: 5,
-    icon: Smartphone,
-    title: 'Mobile Apps',
-    description: 'Native and cross-platform mobile applications that deliver exceptional user experiences on every device.',
-    features: ['iOS Development', 'Android Development', 'React Native', 'Flutter'],
+    icon: Search,
+    title: 'SEO & GEO',
+    description: 'Dominate search rankings and local visibility. We optimise your digital presence for both traditional search engines and AI-driven generative search to ensure your brand is found everywhere.',
+    features: ['Search Optimisation', 'Generative Engine Optimisation', 'Local SEO', 'Technical Audits'],
     color: '#FFD700',
   },
   {
