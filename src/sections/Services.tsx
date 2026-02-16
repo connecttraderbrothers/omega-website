@@ -4,7 +4,7 @@ import {
   Code, 
   Megaphone, 
   LineChart, 
-  Smartphone, 
+  Search, 
   Globe 
 } from 'lucide-react';
 
@@ -38,7 +38,7 @@ const services = [
     icon: LineChart,
     title: 'Marketing',
     description: 'Data-driven digital marketing strategies that drive growth. We help you reach, engage, and convert your ideal customers.',
-    features: ['SEO Optimization', 'Content Strategy', 'Analytics', 'Conversion Rate'],
+    features: ['Content Strategy', 'Analytics', 'Conversion Rate', 'Social Media'],
     color: '#00FF88',
   },
   {
