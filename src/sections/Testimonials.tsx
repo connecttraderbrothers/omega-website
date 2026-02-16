@@ -141,14 +141,6 @@ export default function Testimonials() {
 
                   {/* Author */}
                   <div className="flex items-center gap-4">
-                    <div className="relative">
-                      <img
-                        src={testimonial.image}
-                        alt={testimonial.name}
-                        className="w-14 h-14 rounded-full object-cover border-2 border-white/20"
-                      />
-                      <div className="absolute inset-0 rounded-full border-2 border-neon-yellow/50 scale-110 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </div>
                     <div>
                       <div className="font-semibold text-white">
                         {testimonial.name}
@@ -170,27 +162,6 @@ export default function Testimonials() {
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Stats Row */}
-          <div
-            className={`grid grid-cols-2 md:grid-cols-4 gap-8 mt-20 pt-12 border-t border-white/10 transition-all duration-700 delay-700 ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-            }`}
-          >
-            {[
-              { value: '98%', label: 'Client Satisfaction' },
-              { value: '150+', label: 'Projects Completed' },
-              { value: '50+', label: 'Happy Clients' },
-              { value: '8+', label: 'Years Experience' },
-            ].map((stat) => (
-              <div key={stat.label} className="text-center">
-                <div className="text-3xl sm:text-4xl font-bold text-neon-yellow mb-2">
-                  {stat.value}
-                </div>
-                <div className="text-sm text-white/50">{stat.label}</div>
               </div>
             ))}
           </div>
