@@ -11,27 +11,25 @@ import Footer from './sections/Footer';
 // ─── Splash Screen ────────────────────────────────────────────
 function SplashScreen({ onComplete }: { onComplete: () => void }) {
   const [progress, setProgress] = useState(0);
-  const [phase, setPhase] = useState<'loading' | 'logo' | 'shine' | 'done'>('loading');
+  const [phase, setPhase] = useState<'loading' | 'name' | 'fadeout' | 'done'>('loading');
 
   useEffect(() => {
-    // Phase 1: Loading bar fills over ~2.2s
+    // Phase 1: Loading bar fills over ~2s
     let frame: number;
     let start: number | null = null;
-    const duration = 2200;
+    const duration = 2000;
 
     const animate = (timestamp: number) => {
       if (!start) start = timestamp;
       const elapsed = timestamp - start;
       const p = Math.min(elapsed / duration, 1);
-      // Ease-out curve for a smooth fill
       const eased = 1 - Math.pow(1 - p, 3);
       setProgress(eased * 100);
 
       if (p < 1) {
         frame = requestAnimationFrame(animate);
       } else {
-        // Phase 2: Fade in logo
-        setPhase('logo');
+        setPhase('name');
       }
     };
 
@@ -40,64 +38,36 @@ function SplashScreen({ onComplete }: { onComplete: () => void }) {
   }, []);
 
   useEffect(() => {
-    if (phase === 'logo') {
-      // Logo fades in for 1s, then hold for 0.6s, then shine
-      const timer = setTimeout(() => setPhase('shine'), 1600);
+    if (phase === 'name') {
+      // Company name fades in, hold for 1.4s, then fade out
+      const timer = setTimeout(() => setPhase('fadeout'), 1400);
       return () => clearTimeout(timer);
     }
-    if (phase === 'shine') {
-      // Shine flash for 0.8s, then done
+    if (phase === 'fadeout') {
+      // Splash fades out over 0.8s, then unmount
       const timer = setTimeout(() => setPhase('done'), 800);
       return () => clearTimeout(timer);
     }
     if (phase === 'done') {
-      // Let the fade-out animation finish before unmounting
-      const timer = setTimeout(onComplete, 600);
+      const timer = setTimeout(onComplete, 100);
       return () => clearTimeout(timer);
     }
   }, [phase, onComplete]);
 
   return (
     <div
-      className={`fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-black transition-opacity duration-600 ${
-        phase === 'done' ? 'opacity-0 pointer-events-none' : 'opacity-100'
+      className={`fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-black transition-opacity ${
+        phase === 'fadeout' || phase === 'done' ? 'opacity-0 duration-700' : 'opacity-100 duration-300'
       }`}
+      style={{ pointerEvents: phase === 'done' ? 'none' : 'auto' }}
     >
-      {/* Logo — fades in during 'logo' phase */}
-      <div
-        className={`relative mb-12 transition-all duration-1000 ${
-          phase === 'loading'
-            ? 'opacity-0 scale-90'
-            : 'opacity-100 scale-100'
-        }`}
-      >
-        <div className="w-40 h-40 sm:w-52 sm:h-52 relative">
-          <img
-            src="/hero-logo-circle.png"
-            alt="Omega Digital"
-            className="w-full h-full object-contain"
-          />
-        </div>
-
-        {/* Glow behind logo */}
-        <div
-          className={`absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity duration-700 ${
-            phase !== 'loading' ? 'opacity-100' : 'opacity-0'
-          }`}
-        >
-          <div className="w-[60%] h-[60%] bg-neon-yellow/30 blur-[60px] rounded-full" />
-        </div>
-      </div>
-
-      {/* Loading bar — visible during 'loading' phase */}
+      {/* Loading bar */}
       <div
         className={`relative w-64 sm:w-80 transition-opacity duration-500 ${
           phase === 'loading' ? 'opacity-100' : 'opacity-0'
         }`}
       >
-        {/* Bar track */}
         <div className="h-[2px] bg-white/10 rounded-full overflow-hidden">
-          {/* Bar fill */}
           <div
             className="h-full rounded-full transition-none"
             style={{
@@ -106,7 +76,6 @@ function SplashScreen({ onComplete }: { onComplete: () => void }) {
             }}
           />
         </div>
-        {/* Percentage */}
         <div className="mt-4 text-center">
           <span className="text-xs tracking-[0.25em] text-white/40 font-mono">
             {Math.round(progress)}%
@@ -114,26 +83,21 @@ function SplashScreen({ onComplete }: { onComplete: () => void }) {
         </div>
       </div>
 
-      {/* Brand text — appears with logo */}
+      {/* Company name — fades in after loading bar completes */}
       <div
-        className={`absolute bottom-12 transition-all duration-700 delay-300 ${
-          phase !== 'loading' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+        className={`absolute inset-0 flex items-center justify-center transition-opacity duration-700 ${
+          phase === 'name' ? 'opacity-100' : 'opacity-0'
         }`}
       >
-        <span className="text-xs tracking-[0.3em] text-white/30 uppercase">
-          Omega Digital
-        </span>
+        <div className="text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-wider">
+            <span className="text-gradient">OMEGA</span>
+          </h2>
+          <p className="text-lg sm:text-xl font-light text-white/70 tracking-widest mt-1">
+            DIGITAL
+          </p>
+        </div>
       </div>
-
-      {/* Bright shine flash */}
-      <div
-        className={`absolute inset-0 pointer-events-none transition-opacity ${
-          phase === 'shine' ? 'opacity-100 duration-300' : 'opacity-0 duration-500'
-        }`}
-        style={{
-          background: 'radial-gradient(circle at center, rgba(241,254,66,0.6) 0%, rgba(241,254,66,0.2) 30%, rgba(0,191,255,0.1) 50%, transparent 70%)',
-        }}
-      />
     </div>
   );
 }
