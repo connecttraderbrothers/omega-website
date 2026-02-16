@@ -93,7 +93,7 @@ export default function Introduction() {
                 }`}
               >
                 <p>
-                  We are a creative web design and development studio based in New York, 
+                  We are a creative web design and development studio based in Edinburgh, 
                   dedicated to crafting immersive digital experiences that captivate and convert.
                 </p>
                 <p>
