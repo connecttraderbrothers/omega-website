@@ -2,7 +2,6 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import Navigation from './sections/Navigation';
 import Hero from './sections/Hero';
 import Introduction from './sections/Introduction';
-import SelectedWorks from './sections/SelectedWorks';
 import Services from './sections/Services';
 import Process from './sections/Process';
 import Testimonials from './sections/Testimonials';
@@ -185,7 +184,6 @@ function App() {
       <main>
         <Hero />
         <Introduction />
-        <SelectedWorks />
         <Services />
         <Process />
         <Testimonials />
