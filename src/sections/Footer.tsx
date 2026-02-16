@@ -1,5 +1,4 @@
 import { 
-  Github, 
   Twitter, 
   Linkedin, 
   Instagram, 
@@ -8,7 +7,6 @@ import {
 } from 'lucide-react';
 
 const socialLinks = [
-  { icon: Github, href: '#', label: 'GitHub' },
   { icon: Twitter, href: '#', label: 'Twitter' },
   { icon: Linkedin, href: '#', label: 'LinkedIn' },
   { icon: Instagram, href: '#', label: 'Instagram' },
