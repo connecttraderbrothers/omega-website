@@ -8,7 +8,6 @@ interface NavigationProps {
 const navLinks = [
   { name: 'Home', href: '#hero' },
   { name: 'About', href: '#introduction' },
-  { name: 'Works', href: '#works' },
   { name: 'Services', href: '#services' },
   { name: 'Process', href: '#process' },
   { name: 'Contact', href: '#contact' },
