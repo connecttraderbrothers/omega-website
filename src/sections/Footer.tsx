@@ -133,7 +133,7 @@ export default function Footer() {
             <div className="flex items-center gap-2 text-white/50 text-sm">
               <span>Â© 2024 Omega Digital. Made with</span>
               <Heart className="w-4 h-4 text-red-500 fill-red-500" />
-              <span>in New York</span>
+              <span>in Edinburgh</span>
             </div>
 
             <button
