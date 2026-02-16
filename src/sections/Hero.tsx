@@ -100,7 +100,7 @@ export default function Hero() {
     // Start canvas draw loop immediately
     drawRafRef.current = requestAnimationFrame(drawFrame);
 
-    // Attempt autoplay
+    // Attempt autoplay with aggressive retries
     const tryPlay = () => {
       video.play().catch(() => {
         setTimeout(() => video.play().catch(() => {}), 100);
@@ -109,6 +109,15 @@ export default function Hero() {
 
     tryPlay();
     video.addEventListener('canplay', tryPlay, { once: true });
+    video.addEventListener('loadeddata', tryPlay, { once: true });
+
+    // Retry every 500ms for the first 3 seconds (covers splash screen time)
+    const retryInterval = setInterval(() => {
+      if (video.paused && directionRef.current === 'forward') {
+        video.play().catch(() => {});
+      }
+    }, 500);
+    const stopRetry = setTimeout(() => clearInterval(retryInterval), 3000);
 
     // Fallback: play on user interaction
     const handleInteraction = () => {
@@ -120,10 +129,10 @@ export default function Hero() {
     document.addEventListener('touchstart', handleInteraction, { once: true });
     document.addEventListener('scroll', handleInteraction, { once: true });
 
-    // Delay hero content animations until after splash screen (~5.2s)
+    // Delay hero content animations until after splash screen finishes (~4.3s)
     const splashTimer = setTimeout(() => {
       setIsLoaded(true);
-    }, 5200);
+    }, 4300);
 
     return () => {
       video.removeEventListener('ended', handleEnded);
@@ -132,6 +141,8 @@ export default function Hero() {
       document.removeEventListener('scroll', handleInteraction);
       if (drawRafRef.current) cancelAnimationFrame(drawRafRef.current);
       if (reverseRafRef.current) cancelAnimationFrame(reverseRafRef.current);
+      clearInterval(retryInterval);
+      clearTimeout(stopRetry);
       clearTimeout(splashTimer);
     };
   }, [stepReverse, drawFrame]);
