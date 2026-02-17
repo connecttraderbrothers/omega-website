@@ -13,7 +13,7 @@ const testimonials = [
     id: 2,
     name: 'Dean Finlayson',
     role: 'Founder',
-    quote: 'As a "growth partner" deeply embedded in the world of AI-driven automations, we at Level One have a pretty high bar when it comes to digital infrastructure. We spend our days optimizing workflows and building future-ready systems, so we knew our own brand identity needed to reflect that same level of precision and innovation. Omega didn\'t just meet that bar, they cleared it comfortably.',
+    quote: 'We at Level One have a pretty high bar when it comes to digital infrastructure. We spend our days optimizing workflows and building future-ready systems, so we knew our own brand identity needed to reflect that same level of precision and innovation. Omega didn\'t just meet that bar, they cleared it comfortably.',
     rating: 5,
   },
   {
