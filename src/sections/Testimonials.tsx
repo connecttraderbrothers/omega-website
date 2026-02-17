@@ -6,14 +6,14 @@ const testimonials = [
     id: 1,
     name: 'Milosz Sawczak.',
     role: 'Director',
-    quote: 'In the construction business, we know that a project is only as good as its foundation. When it came time to build our digital presence, Omega proved they are the master contractors of the web. They didn’t just build us a "pretty" site; they built a high-performance lead-generation machine.',
+    quote: 'In the construction business, we know that a project is only as good as its foundation. When it came time to build our digital presence, Omega proved they are the master contractors of the web. They didn\'t just build us a "pretty" site; they built a high-performance lead-generation machine.',
     rating: 5,
   },
   {
     id: 2,
     name: 'Dean Finlayson',
     role: 'Founder',
-    quote: 'As a "growth partner" deeply embedded in the world of AI-driven automations, we at Level One have a pretty high bar when it comes to digital infrastructure. We spend our days optimizing workflows and building future-ready systems, so we knew our own brand identity needed to reflect that same level of precision and innovation. Omega didn't just meet that bar, they cleared it comfortably.',
+    quote: 'As a "growth partner" deeply embedded in the world of AI-driven automations, we at Level One have a pretty high bar when it comes to digital infrastructure. We spend our days optimizing workflows and building future-ready systems, so we knew our own brand identity needed to reflect that same level of precision and innovation. Omega didn\'t just meet that bar, they cleared it comfortably.',
     rating: 5,
   },
   {
@@ -88,7 +88,7 @@ export default function Testimonials() {
                 isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
               }`}
             >
-              Don't just take our word for it. Here's what our clients have to say 
+              Don't just take our word for it. Here's what our clients have to say
               about working with us.
             </p>
           </div>
@@ -101,7 +101,7 @@ export default function Testimonials() {
                 className={`group relative transition-all duration-700 ${
                   isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
                 }`}
-                style={{ 
+                style={{
                   transitionDelay: `${300 + index * 150}ms`,
                   animation: isVisible && hoveredCard !== testimonial.id ? `float ${5 + index}s ease-in-out infinite` : 'none',
                   animationDelay: `${index * 0.5}s`,
@@ -133,7 +133,7 @@ export default function Testimonials() {
 
                   {/* Quote */}
                   <p className="text-white/70 leading-relaxed mb-8 text-lg">
-                    "{testimonial.quote}"
+                    &quot;{testimonial.quote}&quot;
                   </p>
 
                   {/* Author */}
@@ -155,7 +155,7 @@ export default function Testimonials() {
                     }`}
                   >
                     <div className="absolute bottom-4 right-4 text-6xl font-bold text-neon-yellow">
-                      "
+                      &quot;
                     </div>
                   </div>
                 </div>
