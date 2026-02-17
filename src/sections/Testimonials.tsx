@@ -4,18 +4,18 @@ import { Quote, Star } from 'lucide-react';
 const testimonials = [
   {
     id: 1,
-    name: 'Michael Chen',
-    role: 'CEO, TechVenture Inc.',
+    name: 'Milosz S.',
+    role: 'Director',
     image: '/client-1.jpg',
-    quote: 'Omega transformed our digital presence completely. Their attention to detail and creative vision exceeded all our expectations. The results speak for themselves.',
+    quote: 'In the construction business, we know that a project is only as good as its foundation. When it came time to build our digital presence, Omega proved they are the master contractors of the web. They didn’t just build us a "pretty" site; they built a high-performance lead-generation machine.',
     rating: 5,
   },
   {
     id: 2,
-    name: 'Sarah Williams',
-    role: 'Marketing Director, Global Brands',
+    name: 'Dean Finlayson',
+    role: 'Founder',
     image: '/client-2.jpg',
-    quote: 'Exceptional attention to detail and a team that truly understands modern web design. They delivered on time and the quality was outstanding.',
+    quote: 'As a "growth partner" deeply embedded in the world of AI-driven automations, we at Level One have a pretty high bar when it comes to digital infrastructure. We spend our days optimizing workflows and building future-ready systems, so we knew our own brand identity needed to reflect that same level of precision and innovation. Omega didn't just meet that bar, they cleared it comfortably.',
     rating: 5,
   },
   {
