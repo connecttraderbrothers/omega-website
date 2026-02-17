@@ -4,7 +4,7 @@ import { Quote, Star } from 'lucide-react';
 const testimonials = [
   {
     id: 1,
-    name: 'Milosz S.',
+    name: 'Milosz Sawczak.',
     role: 'Director',
     image: '/client-1.jpg',
     quote: 'In the construction business, we know that a project is only as good as its foundation. When it came time to build our digital presence, Omega proved they are the master contractors of the web. They didn’t just build us a "pretty" site; they built a high-performance lead-generation machine.',
