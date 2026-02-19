@@ -105,7 +105,7 @@ export default function Services() {
     };
   }, [isVisible]);
 
-  // Smooth mouse tracking with lerp for fluid spotlight movement
+  // Smooth mouse tracking with lerp — viewport-relative for pinned bg
   const animate = useCallback(() => {
     const lerp = 0.08;
     currentRef.current.x += (targetRef.current.x - currentRef.current.x) * lerp;
@@ -116,11 +116,9 @@ export default function Services() {
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (!sectionRef.current) return;
-      const rect = sectionRef.current.getBoundingClientRect();
       targetRef.current = {
-        x: (e.clientX - rect.left) / rect.width,
-        y: (e.clientY - rect.top) / rect.height,
+        x: e.clientX / window.innerWidth,
+        y: e.clientY / window.innerHeight,
       };
     };
 
@@ -139,10 +137,11 @@ export default function Services() {
     <section
       id="services"
       ref={sectionRef}
-      className="relative min-h-screen flex flex-col justify-center py-24 lg:py-32 bg-black overflow-hidden"
+      className="relative bg-black"
+      style={{ overflowX: 'clip' }}
     >
-      {/* Hero Background Image */}
-      <div className="absolute inset-0 overflow-hidden">
+      {/* Hero Background — sticks to viewport while content scrolls over it */}
+      <div className="sticky top-0 h-screen z-0 overflow-hidden">
         <img
           src="/project-3.jpg"
           alt=""
@@ -162,139 +161,144 @@ export default function Services() {
         />
       </div>
 
-      <div className="relative z-10 w-full px-6 lg:px-12">
-        <div className="max-w-7xl mx-auto">
-          {/* Section Header */}
-          <div className="text-center mb-16">
-            <div
-              className={`inline-flex items-center gap-2 mb-6 transition-all duration-200 ${
-                revealStep >= 0 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'
-              }`}
-              style={codeRevealStyle}
-            >
-              <div className="w-8 h-[2px] bg-neon-yellow" />
-              <span className="text-neon-yellow text-sm tracking-widest uppercase">
-                What We Do
-              </span>
-              <div className="w-8 h-[2px] bg-neon-yellow" />
-            </div>
-            <h2
-              className={`text-4xl sm:text-5xl lg:text-6xl font-bold transition-all duration-200 ${
-                revealStep >= 1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'
-              }`}
-              style={codeRevealStyle}
-            >
-              OUR{' '}
-              <span className="text-gradient">SERVICES</span>
-            </h2>
-            <p
-              className={`text-white/50 max-w-2xl mx-auto mt-6 transition-all duration-200 ${
-                revealStep >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'
-              }`}
-              style={codeRevealStyle}
-            >
-              Comprehensive digital solutions tailored to your unique needs.
-              From concept to launch, we're with you every step of the way.
-            </p>
-          </div>
-
-          {/* Services Accordion */}
-          <div className="flex flex-col lg:flex-row gap-4">
-            {services.map((service, index) => (
-              <div
-                key={service.id}
-                className={`service-slice relative rounded-2xl overflow-hidden cursor-pointer min-h-[200px] lg:h-[400px] ${
-                  activeService === service.id ? 'lg:flex-[4]' : 'lg:flex-1'
-                } ${
-                  revealStep >= 3 + index ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'
-                }`}
-                style={{
-                  transition: hasAnimated
-                    ? 'flex 300ms cubic-bezier(0.4, 0, 0.2, 1)'
-                    : 'flex 300ms cubic-bezier(0.4, 0, 0.2, 1), opacity 200ms steps(4, end), transform 200ms steps(4, end)',
-                }}
-                onMouseEnter={() => setActiveService(service.id)}
-              >
+      {/* Content — pulls up over sticky bg via negative margin, scrolls normally */}
+      <div className="relative z-10" style={{ marginTop: '-100vh' }}>
+        <div className="min-h-screen flex flex-col justify-center py-24 lg:py-32">
+          <div className="w-full px-6 lg:px-12">
+            <div className="max-w-7xl mx-auto">
+              {/* Section Header */}
+              <div className="text-center mb-16">
                 <div
-                  className={`absolute inset-0 transition-all duration-300 ease-in-out ${
-                    activeService === service.id
-                      ? 'bg-omega-dark'
-                      : 'bg-white/5'
+                  className={`inline-flex items-center gap-2 mb-6 transition-all duration-200 ${
+                    revealStep >= 0 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'
                   }`}
-                />
+                  style={codeRevealStyle}
+                >
+                  <div className="w-8 h-[2px] bg-neon-yellow" />
+                  <span className="text-neon-yellow text-sm tracking-widest uppercase">
+                    What We Do
+                  </span>
+                  <div className="w-8 h-[2px] bg-neon-yellow" />
+                </div>
+                <h2
+                  className={`text-4xl sm:text-5xl lg:text-6xl font-bold transition-all duration-200 ${
+                    revealStep >= 1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'
+                  }`}
+                  style={codeRevealStyle}
+                >
+                  OUR{' '}
+                  <span className="text-gradient">SERVICES</span>
+                </h2>
+                <p
+                  className={`text-white/50 max-w-2xl mx-auto mt-6 transition-all duration-200 ${
+                    revealStep >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'
+                  }`}
+                  style={codeRevealStyle}
+                >
+                  Comprehensive digital solutions tailored to your unique needs.
+                  From concept to launch, we're with you every step of the way.
+                </p>
+              </div>
 
-                {/* Border Glow */}
-                <div
-                  className="absolute inset-0 rounded-2xl transition-all duration-300 ease-in-out"
-                  style={{
-                    border: `2px solid ${activeService === service.id ? service.color : 'rgba(255,255,255,0.1)'}`,
-                    boxShadow: activeService === service.id ? `0 0 30px ${service.color}30` : 'none',
-                  }}
-                />
-
-                <div className="relative h-full p-6 lg:p-8 flex flex-col">
-                  {/* Icon */}
+              {/* Services Accordion */}
+              <div className="flex flex-col lg:flex-row gap-4">
+                {services.map((service, index) => (
                   <div
-                    className="w-14 h-14 shrink-0 rounded-xl flex items-center justify-center mb-6"
+                    key={service.id}
+                    className={`service-slice relative rounded-2xl overflow-hidden cursor-pointer min-h-[200px] lg:h-[400px] ${
+                      activeService === service.id ? 'lg:flex-[4]' : 'lg:flex-1'
+                    } ${
+                      revealStep >= 3 + index ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'
+                    }`}
                     style={{
-                      backgroundColor: `${service.color}20`,
+                      transition: hasAnimated
+                        ? 'flex 300ms cubic-bezier(0.4, 0, 0.2, 1)'
+                        : 'flex 300ms cubic-bezier(0.4, 0, 0.2, 1), opacity 200ms steps(4, end), transform 200ms steps(4, end)',
                     }}
+                    onMouseEnter={() => setActiveService(service.id)}
                   >
-                    <service.icon
-                      className="w-7 h-7 transition-transform duration-300 ease-in-out"
-                      style={{ color: service.color }}
+                    <div
+                      className={`absolute inset-0 transition-all duration-300 ease-in-out ${
+                        activeService === service.id
+                          ? 'bg-omega-dark'
+                          : 'bg-white/5'
+                      }`}
                     />
-                  </div>
 
-                  {/* Title - Always Visible */}
-                  <h3
-                    className={`text-xl lg:text-2xl font-bold mb-4 transition-all duration-300 ease-in-out ${
-                      activeService === service.id ? '' : 'lg:writing-mode-vertical'
-                    }`}
-                    style={{
-                      color: activeService === service.id ? service.color : 'white',
-                    }}
-                  >
-                    {service.title}
-                  </h3>
+                    {/* Border Glow */}
+                    <div
+                      className="absolute inset-0 rounded-2xl transition-all duration-300 ease-in-out"
+                      style={{
+                        border: `2px solid ${activeService === service.id ? service.color : 'rgba(255,255,255,0.1)'}`,
+                        boxShadow: activeService === service.id ? `0 0 30px ${service.color}30` : 'none',
+                      }}
+                    />
 
-                  {/* Content - Only visible when active */}
-                  <div
-                    className={`flex-1 transition-all duration-300 ease-in-out ${
-                      activeService === service.id
-                        ? 'opacity-100 translate-y-0 delay-200'
-                        : 'opacity-0 translate-y-4 pointer-events-none absolute delay-0'
-                    }`}
-                  >
-                    <p className="text-white/60 mb-6 leading-relaxed">
-                      {service.description}
-                    </p>
+                    <div className="relative h-full p-6 lg:p-8 flex flex-col">
+                      {/* Icon */}
+                      <div
+                        className="w-14 h-14 shrink-0 rounded-xl flex items-center justify-center mb-6"
+                        style={{
+                          backgroundColor: `${service.color}20`,
+                        }}
+                      >
+                        <service.icon
+                          className="w-7 h-7 transition-transform duration-300 ease-in-out"
+                          style={{ color: service.color }}
+                        />
+                      </div>
 
-                    {/* Features */}
-                    <div className="flex flex-wrap gap-2">
-                      {service.features.map((feature) => (
-                        <span
-                          key={feature}
-                          className="px-3 py-1 text-xs rounded-full bg-white/10 text-white/70"
-                        >
-                          {feature}
-                        </span>
-                      ))}
+                      {/* Title - Always Visible */}
+                      <h3
+                        className={`text-xl lg:text-2xl font-bold mb-4 transition-all duration-300 ease-in-out ${
+                          activeService === service.id ? '' : 'lg:writing-mode-vertical'
+                        }`}
+                        style={{
+                          color: activeService === service.id ? service.color : 'white',
+                        }}
+                      >
+                        {service.title}
+                      </h3>
+
+                      {/* Content - Only visible when active */}
+                      <div
+                        className={`flex-1 transition-all duration-300 ease-in-out ${
+                          activeService === service.id
+                            ? 'opacity-100 translate-y-0 delay-200'
+                            : 'opacity-0 translate-y-4 pointer-events-none absolute delay-0'
+                        }`}
+                      >
+                        <p className="text-white/60 mb-6 leading-relaxed">
+                          {service.description}
+                        </p>
+
+                        {/* Features */}
+                        <div className="flex flex-wrap gap-2">
+                          {service.features.map((feature) => (
+                            <span
+                              key={feature}
+                              className="px-3 py-1 text-xs rounded-full bg-white/10 text-white/70"
+                            >
+                              {feature}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Number */}
+                      <div
+                        className={`absolute bottom-6 right-6 text-6xl font-bold transition-all duration-300 ease-in-out ${
+                          activeService === service.id ? 'opacity-20' : 'opacity-10'
+                        }`}
+                        style={{ color: service.color }}
+                      >
+                        0{service.id}
+                      </div>
                     </div>
                   </div>
-
-                  {/* Number */}
-                  <div
-                    className={`absolute bottom-6 right-6 text-6xl font-bold transition-all duration-300 ease-in-out ${
-                      activeService === service.id ? 'opacity-20' : 'opacity-10'
-                    }`}
-                    style={{ color: service.color }}
-                  >
-                    0{service.id}
-                  </div>
-                </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </div>
