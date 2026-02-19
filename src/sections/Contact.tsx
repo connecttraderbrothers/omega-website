@@ -90,7 +90,7 @@ export default function Contact() {
     <section
       id="contact"
       ref={sectionRef}
-      className="relative py-24 lg:py-32 bg-black overflow-hidden"
+      className="relative min-h-screen flex flex-col justify-center py-24 lg:py-32 bg-black overflow-hidden"
     >
       {/* Hero Background Image with 3D perspective tilt */}
       <div className="absolute inset-0 overflow-hidden">

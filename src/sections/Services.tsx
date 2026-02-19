@@ -59,10 +59,15 @@ const services = [
   },
 ];
 
+// Timings for sequential code-like reveal (ms)
+const REVEAL_TIMINGS = [0, 80, 160, 350, 430, 510, 590, 670, 750];
+const REVEAL_DONE = 1000;
+
 export default function Services() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [hasAnimated, setHasAnimated] = useState(false);
+  const [revealStep, setRevealStep] = useState(-1);
   const [activeService, setActiveService] = useState<number | null>(1);
   const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
   const rafRef = useRef<number | null>(null);
@@ -74,9 +79,6 @@ export default function Services() {
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true);
-          // Allow entrance stagger to finish before switching to fast hover transitions
-          const lastCardDelay = 400 + (services.length - 1) * 150;
-          setTimeout(() => setHasAnimated(true), lastCardDelay + 700);
           observer.disconnect();
         }
       },
@@ -89,6 +91,19 @@ export default function Services() {
 
     return () => observer.disconnect();
   }, []);
+
+  // Code-like sequential reveal — elements snap in one by one
+  useEffect(() => {
+    if (!isVisible) return;
+    const timers = REVEAL_TIMINGS.map((delay, i) =>
+      setTimeout(() => setRevealStep(i), delay)
+    );
+    const doneTimer = setTimeout(() => setHasAnimated(true), REVEAL_DONE);
+    return () => {
+      timers.forEach(clearTimeout);
+      clearTimeout(doneTimer);
+    };
+  }, [isVisible]);
 
   // Smooth mouse tracking with lerp for fluid spotlight movement
   const animate = useCallback(() => {
@@ -117,11 +132,14 @@ export default function Services() {
     };
   }, [animate]);
 
+  // Shared style for the code-like snap-in transition
+  const codeRevealStyle = { transitionTimingFunction: 'steps(4, end)' };
+
   return (
     <section
       id="services"
       ref={sectionRef}
-      className="relative py-24 lg:py-32 bg-black overflow-hidden"
+      className="relative min-h-screen flex flex-col justify-center py-24 lg:py-32 bg-black overflow-hidden"
     >
       {/* Hero Background Image */}
       <div className="absolute inset-0 overflow-hidden">
@@ -149,9 +167,10 @@ export default function Services() {
           {/* Section Header */}
           <div className="text-center mb-16">
             <div
-              className={`inline-flex items-center gap-2 mb-6 transition-all duration-700 ${
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+              className={`inline-flex items-center gap-2 mb-6 transition-all duration-200 ${
+                revealStep >= 0 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'
               }`}
+              style={codeRevealStyle}
             >
               <div className="w-8 h-[2px] bg-neon-yellow" />
               <span className="text-neon-yellow text-sm tracking-widest uppercase">
@@ -160,19 +179,21 @@ export default function Services() {
               <div className="w-8 h-[2px] bg-neon-yellow" />
             </div>
             <h2
-              className={`text-4xl sm:text-5xl lg:text-6xl font-bold transition-all duration-700 delay-100 ${
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+              className={`text-4xl sm:text-5xl lg:text-6xl font-bold transition-all duration-200 ${
+                revealStep >= 1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'
               }`}
+              style={codeRevealStyle}
             >
               OUR{' '}
               <span className="text-gradient">SERVICES</span>
             </h2>
             <p
-              className={`text-white/50 max-w-2xl mx-auto mt-6 transition-all duration-700 delay-200 ${
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+              className={`text-white/50 max-w-2xl mx-auto mt-6 transition-all duration-200 ${
+                revealStep >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'
               }`}
+              style={codeRevealStyle}
             >
-              Comprehensive digital solutions tailored to your unique needs. 
+              Comprehensive digital solutions tailored to your unique needs.
               From concept to launch, we're with you every step of the way.
             </p>
           </div>
@@ -185,13 +206,12 @@ export default function Services() {
                 className={`service-slice relative rounded-2xl overflow-hidden cursor-pointer min-h-[200px] lg:h-[400px] ${
                   activeService === service.id ? 'lg:flex-[4]' : 'lg:flex-1'
                 } ${
-                  isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+                  revealStep >= 3 + index ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'
                 }`}
                 style={{
                   transition: hasAnimated
                     ? 'flex 300ms cubic-bezier(0.4, 0, 0.2, 1)'
-                    : 'flex 700ms ease-out, opacity 700ms ease-out, transform 700ms ease-out',
-                  transitionDelay: hasAnimated ? '0ms' : isVisible ? `${400 + index * 150}ms` : '0ms',
+                    : 'flex 300ms cubic-bezier(0.4, 0, 0.2, 1), opacity 200ms steps(4, end), transform 200ms steps(4, end)',
                 }}
                 onMouseEnter={() => setActiveService(service.id)}
               >
@@ -202,7 +222,7 @@ export default function Services() {
                       : 'bg-white/5'
                   }`}
                 />
-                
+
                 {/* Border Glow */}
                 <div
                   className="absolute inset-0 rounded-2xl transition-all duration-300 ease-in-out"
