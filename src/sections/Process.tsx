@@ -41,8 +41,10 @@ const steps = [
 
 export default function Process() {
   const sectionRef = useRef<HTMLDivElement>(null);
+  const timelineRef = useRef<HTMLDivElement>(null);
+  const nodeRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [isVisible, setIsVisible] = useState(false);
-  const [activeStep, setActiveStep] = useState(0);
+  const [activeStep, setActiveStep] = useState(-1);
   const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
@@ -64,30 +66,41 @@ export default function Process() {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (sectionRef.current) {
-        const rect = sectionRef.current.getBoundingClientRect();
-        const windowHeight = window.innerHeight;
-        const sectionHeight = rect.height;
-        
-        // Calculate progress based on how much of the section is visible
-        const scrolled = windowHeight - rect.top;
-        const totalScrollable = sectionHeight + windowHeight;
-        const progress = Math.max(0, Math.min(1, scrolled / totalScrollable));
-        
-        setScrollProgress(progress);
-        
-        // Update active step based on progress
-        const stepIndex = Math.min(
-          steps.length - 1,
-          Math.floor(progress * steps.length)
-        );
-        setActiveStep(stepIndex);
+      if (!timelineRef.current) return;
+
+      const triggerY = window.innerHeight * 0.55;
+      const timelineRect = timelineRef.current.getBoundingClientRect();
+      const timelineHeight = timelineRect.height;
+
+      // Determine active step by checking which nodes the trigger line has passed
+      let newActiveStep = -1;
+      for (let i = 0; i < nodeRefs.current.length; i++) {
+        const node = nodeRefs.current[i];
+        if (!node) continue;
+        const nodeCenter = node.getBoundingClientRect().top + node.offsetHeight / 2;
+        if (nodeCenter <= triggerY) {
+          newActiveStep = i;
+        }
       }
+      setActiveStep(newActiveStep);
+
+      // Progress bar: fill from timeline top to the trigger line position,
+      // but cap at the last node so it hits 100% exactly when step 5 lights up
+      const lastNode = nodeRefs.current[nodeRefs.current.length - 1];
+      if (!lastNode) return;
+      const lastNodeCenter = lastNode.getBoundingClientRect().top + lastNode.offsetHeight / 2;
+      const lastNodeOffset = (lastNodeCenter - timelineRect.top) / timelineHeight;
+
+      const triggerOffset = (triggerY - timelineRect.top) / timelineHeight;
+      const progress = lastNodeOffset > 0
+        ? Math.max(0, Math.min(1, triggerOffset / lastNodeOffset))
+        : 0;
+      setScrollProgress(progress);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
-    
+
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -136,12 +149,12 @@ export default function Process() {
           </div>
 
           {/* Process Timeline */}
-          <div className="relative">
+          <div ref={timelineRef} className="relative">
             {/* Central Line */}
             <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-white/10 -translate-x-1/2 hidden lg:block">
               {/* Animated Progress Line */}
               <div
-                className="absolute top-0 left-0 w-full bg-gradient-to-b from-neon-yellow to-neon-cyan transition-all duration-300"
+                className="absolute top-0 left-0 w-full bg-gradient-to-b from-neon-yellow to-neon-cyan transition-[height] duration-150 ease-out"
                 style={{ height: `${scrollProgress * 100}%` }}
               />
             </div>
@@ -238,6 +251,7 @@ export default function Process() {
                         }`}
                       >
                         <div
+                          ref={(el) => { nodeRefs.current[index] = el; }}
                           className={`w-20 h-20 rounded-full border-4 flex items-center justify-center transition-all duration-500 ${
                             isActive
                               ? 'border-neon-yellow bg-neon-yellow/20 scale-110 animate-circuit-pulse'
