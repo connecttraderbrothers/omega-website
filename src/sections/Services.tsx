@@ -46,7 +46,7 @@ const services = [
     icon: Search,
     title: 'SEO & GEO',
     description: 'Get found on Google and AI-powered search. We boost your rankings across traditional and generative search engines so customers find you first.',
-    features: ['Search Optimisation', 'Generative Engine Optimisation', 'Technical Audits'],
+    features: ['Search Optimisation', 'Technical Audits', 'Generative Engine Optimisation'],
     color: '#FFD700',
   },
   {
