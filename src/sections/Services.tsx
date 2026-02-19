@@ -168,9 +168,7 @@ export default function Services() {
                 <div className="relative h-full p-6 lg:p-8 flex flex-col">
                   {/* Icon */}
                   <div
-                    className={`w-14 h-14 rounded-xl flex items-center justify-center mb-6 transition-all duration-300 ease-in-out ${
-                      activeService === service.id ? 'scale-110' : ''
-                    }`}
+                    className="w-14 h-14 shrink-0 rounded-xl flex items-center justify-center mb-6"
                     style={{
                       backgroundColor: `${service.color}20`,
                     }}
