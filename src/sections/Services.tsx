@@ -62,6 +62,7 @@ const services = [
 export default function Services() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [hasAnimated, setHasAnimated] = useState(false);
   const [activeService, setActiveService] = useState<number | null>(1);
 
   useEffect(() => {
@@ -69,6 +70,9 @@ export default function Services() {
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true);
+          // Allow entrance stagger to finish before switching to fast hover transitions
+          const lastCardDelay = 400 + (services.length - 1) * 150;
+          setTimeout(() => setHasAnimated(true), lastCardDelay + 700);
           observer.disconnect();
         }
       },
@@ -131,18 +135,21 @@ export default function Services() {
             {services.map((service, index) => (
               <div
                 key={service.id}
-                className={`service-slice relative rounded-2xl overflow-hidden cursor-pointer min-h-[200px] lg:h-[400px] transition-[flex,opacity,transform] duration-700 ease-out ${
+                className={`service-slice relative rounded-2xl overflow-hidden cursor-pointer min-h-[200px] lg:h-[400px] ${
                   activeService === service.id ? 'lg:flex-[4]' : 'lg:flex-1'
                 } ${
                   isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
                 }`}
                 style={{
-                  transitionDelay: isVisible ? `${400 + index * 150}ms` : '0ms',
+                  transition: hasAnimated
+                    ? 'flex 300ms cubic-bezier(0.4, 0, 0.2, 1)'
+                    : 'flex 700ms ease-out, opacity 700ms ease-out, transform 700ms ease-out',
+                  transitionDelay: hasAnimated ? '0ms' : isVisible ? `${400 + index * 150}ms` : '0ms',
                 }}
                 onMouseEnter={() => setActiveService(service.id)}
               >
                 <div
-                  className={`absolute inset-0 transition-all duration-500 ${
+                  className={`absolute inset-0 transition-all duration-300 ease-in-out ${
                     activeService === service.id
                       ? 'bg-omega-dark'
                       : 'bg-white/5'
@@ -151,7 +158,7 @@ export default function Services() {
                 
                 {/* Border Glow */}
                 <div
-                  className="absolute inset-0 rounded-2xl transition-opacity duration-500"
+                  className="absolute inset-0 rounded-2xl transition-all duration-300 ease-in-out"
                   style={{
                     border: `2px solid ${activeService === service.id ? service.color : 'rgba(255,255,255,0.1)'}`,
                     boxShadow: activeService === service.id ? `0 0 30px ${service.color}30` : 'none',
@@ -161,7 +168,7 @@ export default function Services() {
                 <div className="relative h-full p-6 lg:p-8 flex flex-col">
                   {/* Icon */}
                   <div
-                    className={`w-14 h-14 rounded-xl flex items-center justify-center mb-6 transition-all duration-500 ${
+                    className={`w-14 h-14 rounded-xl flex items-center justify-center mb-6 transition-all duration-300 ease-in-out ${
                       activeService === service.id ? 'scale-110' : ''
                     }`}
                     style={{
@@ -169,14 +176,14 @@ export default function Services() {
                     }}
                   >
                     <service.icon
-                      className="w-7 h-7 transition-transform duration-500"
+                      className="w-7 h-7 transition-transform duration-300 ease-in-out"
                       style={{ color: service.color }}
                     />
                   </div>
 
                   {/* Title - Always Visible */}
                   <h3
-                    className={`text-xl lg:text-2xl font-bold mb-4 transition-all duration-500 ${
+                    className={`text-xl lg:text-2xl font-bold mb-4 transition-all duration-300 ease-in-out ${
                       activeService === service.id ? '' : 'lg:writing-mode-vertical'
                     }`}
                     style={{
@@ -188,9 +195,9 @@ export default function Services() {
 
                   {/* Content - Only visible when active */}
                   <div
-                    className={`flex-1 transition-all duration-500 ${
+                    className={`flex-1 transition-all duration-300 ease-in-out ${
                       activeService === service.id
-                        ? 'opacity-100 translate-y-0 delay-500'
+                        ? 'opacity-100 translate-y-0 delay-200'
                         : 'opacity-0 translate-y-4 pointer-events-none absolute delay-0'
                     }`}
                   >
@@ -213,7 +220,7 @@ export default function Services() {
 
                   {/* Number */}
                   <div
-                    className={`absolute bottom-6 right-6 text-6xl font-bold transition-all duration-500 ${
+                    className={`absolute bottom-6 right-6 text-6xl font-bold transition-all duration-300 ease-in-out ${
                       activeService === service.id ? 'opacity-20' : 'opacity-10'
                     }`}
                     style={{ color: service.color }}
