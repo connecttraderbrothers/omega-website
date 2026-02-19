@@ -192,8 +192,8 @@ export default function Services() {
                   <div
                     className={`flex-1 transition-all duration-500 ${
                       activeService === service.id
-                        ? 'opacity-100 translate-y-0'
-                        : 'opacity-0 translate-y-4 pointer-events-none absolute'
+                        ? 'opacity-100 translate-y-0 delay-500'
+                        : 'opacity-0 translate-y-4 pointer-events-none absolute delay-0'
                     }`}
                   >
                     <p className="text-white/60 mb-6 leading-relaxed">
