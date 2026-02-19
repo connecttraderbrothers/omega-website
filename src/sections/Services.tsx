@@ -45,8 +45,8 @@ const services = [
     id: 5,
     icon: Search,
     title: 'SEO & GEO',
-    description: 'Dominate search rankings and local visibility. We optimise your digital presence for both traditional search engines and AI-driven generative search to ensure your brand is found everywhere.',
-    features: ['Search Optimisation', 'Generative Engine Optimisation', 'Local SEO', 'Technical Audits'],
+    description: 'Get found on Google and AI-powered search. We boost your rankings across traditional and generative search engines so customers find you first.',
+    features: ['Search Optimisation', 'Generative Engine Optimisation', 'Technical Audits'],
     color: '#FFD700',
   },
   {
