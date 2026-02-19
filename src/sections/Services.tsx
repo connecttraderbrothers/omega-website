@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
-import { 
-  Palette, 
-  Code, 
-  Megaphone, 
-  LineChart, 
-  Search, 
-  Globe 
+import { useEffect, useRef, useState, useCallback } from 'react';
+import {
+  Palette,
+  Code,
+  Megaphone,
+  LineChart,
+  Search,
+  Globe
 } from 'lucide-react';
 
 const services = [
@@ -64,6 +64,10 @@ export default function Services() {
   const [isVisible, setIsVisible] = useState(false);
   const [hasAnimated, setHasAnimated] = useState(false);
   const [activeService, setActiveService] = useState<number | null>(1);
+  const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
+  const rafRef = useRef<number | null>(null);
+  const targetRef = useRef({ x: 0.5, y: 0.5 });
+  const currentRef = useRef({ x: 0.5, y: 0.5 });
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -86,15 +90,58 @@ export default function Services() {
     return () => observer.disconnect();
   }, []);
 
+  // Smooth mouse tracking with lerp for fluid spotlight movement
+  const animate = useCallback(() => {
+    const lerp = 0.08;
+    currentRef.current.x += (targetRef.current.x - currentRef.current.x) * lerp;
+    currentRef.current.y += (targetRef.current.y - currentRef.current.y) * lerp;
+    setMousePos({ x: currentRef.current.x, y: currentRef.current.y });
+    rafRef.current = requestAnimationFrame(animate);
+  }, []);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!sectionRef.current) return;
+      const rect = sectionRef.current.getBoundingClientRect();
+      targetRef.current = {
+        x: (e.clientX - rect.left) / rect.width,
+        y: (e.clientY - rect.top) / rect.height,
+      };
+    };
+
+    rafRef.current = requestAnimationFrame(animate);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, [animate]);
+
   return (
     <section
       id="services"
       ref={sectionRef}
       className="relative py-24 lg:py-32 bg-black overflow-hidden"
     >
-      {/* Background Gradient */}
-      <div className="absolute inset-0">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-neon-yellow/5 rounded-full blur-[150px]" />
+      {/* Hero Background Image */}
+      <div className="absolute inset-0 overflow-hidden">
+        <img
+          src="/project-3.jpg"
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{
+            transform: `translate(${(mousePos.x - 0.5) * -12}px, ${(mousePos.y - 0.5) * -12}px) scale(1.05)`,
+          }}
+        />
+        {/* Dark overlay for readability */}
+        <div className="absolute inset-0 bg-black/70" />
+        {/* Cursor spotlight — reveals the image underneath */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: `radial-gradient(600px circle at ${mousePos.x * 100}% ${mousePos.y * 100}%, rgba(0,255,136,0.12) 0%, transparent 60%)`,
+          }}
+        />
       </div>
 
       <div className="relative z-10 w-full px-6 lg:px-12">
