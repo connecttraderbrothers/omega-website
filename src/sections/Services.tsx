@@ -135,13 +135,10 @@ export default function Services() {
             {services.map((service) => (
               <div
                 key={service.id}
-                className={`service-slice relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-500 ${
+                className={`service-slice relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-500 min-h-[200px] lg:h-[400px] ${
                   activeService === service.id ? 'lg:flex-[4]' : 'lg:flex-1'
                 }`}
                 onMouseEnter={() => setActiveService(service.id)}
-                style={{
-                  minHeight: activeService === service.id ? '400px' : '200px',
-                }}
               >
                 <div
                   className={`absolute inset-0 transition-all duration-500 ${
