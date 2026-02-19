@@ -134,7 +134,7 @@ function App() {
   }, []);
 
   return (
-    <div ref={mainRef} className="relative min-h-screen bg-black text-white overflow-x-hidden">
+    <div ref={mainRef} className="relative min-h-screen bg-black text-white" style={{ overflowX: 'clip' }}>
       {/* Splash Screen */}
       {!splashDone && <SplashScreen onComplete={handleSplashComplete} />}
 
