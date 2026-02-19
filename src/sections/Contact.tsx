@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { Send, Mail, MapPin, Phone, CheckCircle, Loader2 } from 'lucide-react';
 
 export default function Contact() {
@@ -12,6 +12,10 @@ export default function Contact() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
+  const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
+  const rafRef = useRef<number | null>(null);
+  const targetRef = useRef({ x: 0.5, y: 0.5 });
+  const currentRef = useRef({ x: 0.5, y: 0.5 });
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -30,6 +34,33 @@ export default function Contact() {
 
     return () => observer.disconnect();
   }, []);
+
+  // Smooth mouse tracking with lerp for fluid perspective tilt
+  const animate = useCallback(() => {
+    const lerp = 0.06;
+    currentRef.current.x += (targetRef.current.x - currentRef.current.x) * lerp;
+    currentRef.current.y += (targetRef.current.y - currentRef.current.y) * lerp;
+    setMousePos({ x: currentRef.current.x, y: currentRef.current.y });
+    rafRef.current = requestAnimationFrame(animate);
+  }, []);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!sectionRef.current) return;
+      const rect = sectionRef.current.getBoundingClientRect();
+      targetRef.current = {
+        x: (e.clientX - rect.left) / rect.width,
+        y: (e.clientY - rect.top) / rect.height,
+      };
+    };
+
+    rafRef.current = requestAnimationFrame(animate);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, [animate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,16 +92,23 @@ export default function Contact() {
       ref={sectionRef}
       className="relative py-24 lg:py-32 bg-black overflow-hidden"
     >
-      {/* Background Grid */}
-      <div className="absolute inset-0 opacity-10">
-        <div
-          className="absolute inset-0"
+      {/* Hero Background Image with 3D perspective tilt */}
+      <div className="absolute inset-0 overflow-hidden">
+        <img
+          src="/project-2.jpg"
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
           style={{
-            backgroundImage: `
-              linear-gradient(rgba(241, 254, 66, 0.2) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(241, 254, 66, 0.2) 1px, transparent 1px)
-            `,
-            backgroundSize: '40px 40px',
+            transform: `perspective(800px) rotateX(${(mousePos.y - 0.5) * 3}deg) rotateY(${(mousePos.x - 0.5) * -4}deg) scale(1.08)`,
+          }}
+        />
+        {/* Dark overlay for readability */}
+        <div className="absolute inset-0 bg-black/65" />
+        {/* Cursor-following horizon glow — warm yellow sweep along the grid lines */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: `radial-gradient(900px 400px ellipse at ${mousePos.x * 100}% ${mousePos.y * 100}%, rgba(241,254,66,0.08) 0%, transparent 70%)`,
           }}
         />
       </div>
