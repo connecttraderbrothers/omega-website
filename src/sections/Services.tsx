@@ -127,17 +127,18 @@ export default function Services() {
           </div>
 
           {/* Services Accordion */}
-          <div
-            className={`flex flex-col lg:flex-row gap-4 transition-all duration-700 delay-300 ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-            }`}
-          >
-            {services.map((service) => (
+          <div className="flex flex-col lg:flex-row gap-4">
+            {services.map((service, index) => (
               <div
                 key={service.id}
-                className={`service-slice relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-500 min-h-[200px] lg:h-[400px] ${
+                className={`service-slice relative rounded-2xl overflow-hidden cursor-pointer min-h-[200px] lg:h-[400px] transition-[flex,opacity,transform] duration-700 ease-out ${
                   activeService === service.id ? 'lg:flex-[4]' : 'lg:flex-1'
+                } ${
+                  isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
                 }`}
+                style={{
+                  transitionDelay: isVisible ? `${400 + index * 150}ms` : '0ms',
+                }}
                 onMouseEnter={() => setActiveService(service.id)}
               >
                 <div
