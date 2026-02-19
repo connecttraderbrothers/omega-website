@@ -52,6 +52,10 @@ export default function Introduction() {
       ref={sectionRef}
       className="relative py-24 lg:py-32 bg-black overflow-hidden"
     >
+      {/* Edge blends — smooth transitions with adjacent sections */}
+      <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-black to-transparent pointer-events-none z-20" />
+      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-b from-transparent to-black pointer-events-none z-20" />
+
       {/* Background Elements */}
       <div className="absolute top-0 right-0 w-1/2 h-full opacity-10">
         <div className="absolute inset-0 bg-gradient-to-l from-neon-cyan/20 to-transparent" />

@@ -110,6 +110,9 @@ export default function Contact() {
             background: `radial-gradient(900px 400px ellipse at ${mousePos.x * 100}% ${mousePos.y * 100}%, rgba(241,254,66,0.08) 0%, transparent 70%)`,
           }}
         />
+        {/* Edge blends — soften hero image boundaries */}
+        <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-black to-transparent z-10" />
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-b from-transparent to-black z-10" />
       </div>
 
       {/* Content — pulls up over sticky bg via negative margin, scrolls normally */}

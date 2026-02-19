@@ -56,7 +56,9 @@ export default function Footer() {
   };
 
   return (
-    <footer className="relative bg-omega-dark border-t border-white/10">
+    <footer className="relative bg-omega-dark">
+      {/* Top blend — smooth transition from Contact section */}
+      <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-black to-transparent pointer-events-none z-10" />
       {/* Main Footer */}
       <div className="w-full px-6 lg:px-12 py-16">
         <div className="max-w-7xl mx-auto">
