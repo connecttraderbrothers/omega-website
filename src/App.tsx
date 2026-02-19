@@ -146,16 +146,38 @@ function App() {
       
       {/* Main Content */}
       <main>
-        <Hero />
-        <Introduction />
-        <Services />
-        <Process />
+        {/* Hero group — Hero stays fixed while Introduction slides over */}
+        <div className="relative">
+          <div className="sticky top-0 z-0">
+            <Hero />
+          </div>
+          <div className="relative z-10">
+            <Introduction />
+          </div>
+        </div>
+
+        {/* Services group — Services stays fixed while Process slides over */}
+        <div className="relative">
+          <div className="sticky top-0 z-0">
+            <Services />
+          </div>
+          <div className="relative z-10">
+            <Process />
+          </div>
+        </div>
+
         <Testimonials />
-        <Contact />
+
+        {/* Contact group — Contact stays fixed while Footer slides over */}
+        <div className="relative">
+          <div className="sticky top-0 z-0">
+            <Contact />
+          </div>
+          <div className="relative z-10">
+            <Footer />
+          </div>
+        </div>
       </main>
-      
-      {/* Footer */}
-      <Footer />
     </div>
   );
 }
