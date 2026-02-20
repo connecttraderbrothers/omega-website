@@ -1,5 +1,21 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { ChevronDown, ArrowRight } from 'lucide-react';
+
+// Pre-compute particle positions to avoid Math.random() during render
+function generateParticles(count: number) {
+  const particles = [];
+  for (let i = 0; i < count; i++) {
+    particles.push({
+      left: ((i * 37 + 13) % 100),
+      top: ((i * 53 + 7) % 100),
+      delay: ((i * 41 + 3) % 60) / 10,
+      duration: 4 + ((i * 29 + 11) % 40) / 10,
+    });
+  }
+  return particles;
+}
+
+const PARTICLES = generateParticles(15);
 
 export default function Hero() {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -12,77 +28,68 @@ export default function Hero() {
   const drawRafRef = useRef<number | null>(null);
   const reverseRafRef = useRef<number | null>(null);
 
-  // ─── Draw video frame onto canvas (object-fit: cover) ───
-  const drawFrame = useCallback(() => {
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    if (!video || !canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    // Match canvas size to its display size
-    const rect = canvas.getBoundingClientRect();
-    const dpr = window.devicePixelRatio || 1;
-    const cw = rect.width * dpr;
-    const ch = rect.height * dpr;
-
-    if (canvas.width !== cw || canvas.height !== ch) {
-      canvas.width = cw;
-      canvas.height = ch;
-    }
-
-    // Only draw if video has data
-    if (video.readyState >= 2) {
-      const vw = video.videoWidth;
-      const vh = video.videoHeight;
-
-      if (vw && vh) {
-        // Calculate object-fit: cover crop
-        const canvasRatio = cw / ch;
-        const videoRatio = vw / vh;
-
-        let sx = 0, sy = 0, sw = vw, sh = vh;
-
-        if (videoRatio > canvasRatio) {
-          // Video is wider — crop sides
-          sw = vh * canvasRatio;
-          sx = (vw - sw) / 2;
-        } else {
-          // Video is taller — crop top/bottom
-          sh = vw / canvasRatio;
-          sy = (vh - sh) / 2;
-        }
-
-        ctx.drawImage(video, sx, sy, sw, sh, 0, 0, cw, ch);
-      }
-    }
-
-    drawRafRef.current = requestAnimationFrame(drawFrame);
-  }, []);
-
-  // ─── Reverse playback by stepping currentTime backwards ───
-  const stepReverse = useCallback(() => {
-    const video = videoRef.current;
-    if (!video || directionRef.current !== 'reverse') return;
-
-    if (video.currentTime <= 0.05) {
-      // Reached the start — switch back to forward
-      directionRef.current = 'forward';
-      video.currentTime = 0;
-      video.play().catch(() => {});
-      return;
-    }
-
-    // Step backwards ~30fps
-    video.currentTime = Math.max(0, video.currentTime - 0.033);
-    reverseRafRef.current = requestAnimationFrame(stepReverse);
-  }, []);
-
-  // ─── Video setup + canvas draw loop ───
+  // ─── Video setup + canvas draw loop + reverse playback ───
   useEffect(() => {
     const video = videoRef.current;
+    const canvas = canvasRef.current;
     if (!video) return;
+
+    // Draw video frame onto canvas (object-fit: cover)
+    const drawFrame = () => {
+      if (video && canvas) {
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          const rect = canvas.getBoundingClientRect();
+          const dpr = window.devicePixelRatio || 1;
+          const cw = rect.width * dpr;
+          const ch = rect.height * dpr;
+
+          if (canvas.width !== cw || canvas.height !== ch) {
+            canvas.width = cw;
+            canvas.height = ch;
+          }
+
+          if (video.readyState >= 2) {
+            const vw = video.videoWidth;
+            const vh = video.videoHeight;
+
+            if (vw && vh) {
+              const canvasRatio = cw / ch;
+              const videoRatio = vw / vh;
+
+              let sx = 0, sy = 0, sw = vw, sh = vh;
+
+              if (videoRatio > canvasRatio) {
+                sw = vh * canvasRatio;
+                sx = (vw - sw) / 2;
+              } else {
+                sh = vw / canvasRatio;
+                sy = (vh - sh) / 2;
+              }
+
+              ctx.drawImage(video, sx, sy, sw, sh, 0, 0, cw, ch);
+            }
+          }
+        }
+      }
+
+      drawRafRef.current = requestAnimationFrame(drawFrame);
+    };
+
+    // Reverse playback by stepping currentTime backwards
+    const stepReverse = () => {
+      if (!video || directionRef.current !== 'reverse') return;
+
+      if (video.currentTime <= 0.05) {
+        directionRef.current = 'forward';
+        video.currentTime = 0;
+        video.play().catch(() => {});
+        return;
+      }
+
+      video.currentTime = Math.max(0, video.currentTime - 0.033);
+      reverseRafRef.current = requestAnimationFrame(stepReverse);
+    };
 
     // Force muted (required for autoplay)
     video.muted = true;
@@ -145,7 +152,7 @@ export default function Hero() {
       clearTimeout(stopRetry);
       clearTimeout(splashTimer);
     };
-  }, [stepReverse, drawFrame]);
+  }, []);
 
   // ─── Mouse parallax ───
   useEffect(() => {
@@ -168,6 +175,16 @@ export default function Hero() {
       element.scrollIntoView({ behavior: 'smooth' });
     }
   };
+
+  // Stable particle styles — computed once
+  const particleStyles = useMemo(() =>
+    PARTICLES.map(p => ({
+      left: `${p.left}%`,
+      top: `${p.top}%`,
+      animationDelay: `${p.delay}s`,
+      animationDuration: `${p.duration}s`,
+    })),
+  []);
 
   return (
     <section
@@ -234,16 +251,11 @@ export default function Hero() {
 
       {/* Floating Particles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(15)].map((_, i) => (
+        {particleStyles.map((style, i) => (
           <div
             key={i}
             className="absolute w-1 h-1 bg-neon-yellow/40 rounded-full animate-float"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 6}s`,
-              animationDuration: `${4 + Math.random() * 4}s`,
-            }}
+            style={style}
           />
         ))}
       </div>

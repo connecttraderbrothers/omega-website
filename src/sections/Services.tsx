@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Palette,
   Code,
@@ -70,7 +70,6 @@ export default function Services() {
   const [revealStep, setRevealStep] = useState(-1);
   const [activeService, setActiveService] = useState<number | null>(1);
   const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
-  const rafRef = useRef<number | null>(null);
   const targetRef = useRef({ x: 0.5, y: 0.5 });
   const currentRef = useRef({ x: 0.5, y: 0.5 });
 
@@ -106,15 +105,17 @@ export default function Services() {
   }, [isVisible]);
 
   // Smooth mouse tracking with lerp — viewport-relative for pinned bg
-  const animate = useCallback(() => {
-    const lerp = 0.08;
-    currentRef.current.x += (targetRef.current.x - currentRef.current.x) * lerp;
-    currentRef.current.y += (targetRef.current.y - currentRef.current.y) * lerp;
-    setMousePos({ x: currentRef.current.x, y: currentRef.current.y });
-    rafRef.current = requestAnimationFrame(animate);
-  }, []);
-
   useEffect(() => {
+    let frameId: number;
+
+    const tick = () => {
+      const lerp = 0.08;
+      currentRef.current.x += (targetRef.current.x - currentRef.current.x) * lerp;
+      currentRef.current.y += (targetRef.current.y - currentRef.current.y) * lerp;
+      setMousePos({ x: currentRef.current.x, y: currentRef.current.y });
+      frameId = requestAnimationFrame(tick);
+    };
+
     const handleMouseMove = (e: MouseEvent) => {
       targetRef.current = {
         x: e.clientX / window.innerWidth,
@@ -122,13 +123,13 @@ export default function Services() {
       };
     };
 
-    rafRef.current = requestAnimationFrame(animate);
+    frameId = requestAnimationFrame(tick);
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      cancelAnimationFrame(frameId);
     };
-  }, [animate]);
+  }, []);
 
   // Shared style for the code-like snap-in transition
   const codeRevealStyle = { transitionTimingFunction: 'steps(4, end)' };
