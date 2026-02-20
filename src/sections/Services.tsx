@@ -141,7 +141,7 @@ export default function Services() {
       style={{ overflowX: 'clip' }}
     >
       {/* Hero Background — sticks to viewport while content scrolls over it */}
-      <div className="sticky top-0 h-screen z-0 overflow-hidden">
+      <div className={`sticky top-0 h-screen z-0 overflow-hidden transition-opacity duration-1000 ease-out ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
         <img
           src="/project-3.jpg"
           alt=""
