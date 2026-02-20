@@ -54,6 +54,10 @@ export default function Testimonials() {
       ref={sectionRef}
       className="relative py-24 lg:py-32 bg-black overflow-hidden"
     >
+      {/* Edge blends — smooth transitions with adjacent sections */}
+      <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-black to-transparent pointer-events-none z-20" />
+      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-b from-transparent to-black pointer-events-none z-20" />
+
       {/* Background Elements */}
       <div className="absolute inset-0">
         <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-neon-purple/10 rounded-full blur-[150px]" />
