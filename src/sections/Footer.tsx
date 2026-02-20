@@ -131,9 +131,7 @@ export default function Footer() {
         <div className="w-full px-6 lg:px-12 py-6">
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2 text-white/50 text-sm">
-              <span>Â© 2024 Omega Digital. Made with</span>
-              <Heart className="w-4 h-4 text-red-500 fill-red-500" />
-              <span>in Edinburgh</span>
+              <span>© 2024 Omega Digital. All rights reserved.</span>
             </div>
 
             <button
